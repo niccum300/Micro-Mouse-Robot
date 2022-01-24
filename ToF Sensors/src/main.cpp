@@ -47,7 +47,7 @@ void configure_tof_xshut_pins()
   GPIOC_PDDR |= MASK(NORTH_XSHUT_PIN_MASK);
   GPIOC_PDDR |= MASK(EAST_XSHUT_PIN_MASK);
   GPIOD_PDDR |= MASK(WEST_XSHUT_PIN_MASK);
-  // set to low
+  // set to low "AGAIN THE XSHUTDOWN PIN IS ACTIVE LOW"
   GPIOC_PDOR |= ~(MASK(NORTH_XSHUT_PIN_MASK) | MASK(EAST_XSHUT_PIN_MASK));
   GPIOD_PCOR |= ~MASK(WEST_XSHUT_PIN_MASK);
 }
@@ -57,15 +57,16 @@ void setup() {
   configure_tof_xshut_pins();
   configure_I2C();
 
+  // Turn on first sensor 
   GPIOC_PDOR |= MASK(NORTH_XSHUT_PIN_MASK);
   if (!NorthSensor.init())
   {
     Serial.println("Failed to detect and initalze north sensor!");
     while (1){}
   }
-
-  NorthSensor.setAddress(NORTH_SENSOR_ADDRESS);
-  Serial.println("North sensor configured");
+  // set address custom I2C address for first sensor
+   NorthSensor.setAddress(NORTH_SENSOR_ADDRESS);
+   Serial.println("North sensor configured");
 
   GPIOC_PDOR |= MASK(EAST_XSHUT_PIN_MASK);
   if (!EastSensor.init())
