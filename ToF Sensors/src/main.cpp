@@ -1,8 +1,10 @@
-#include <Arduino.h>
-#include <VL53L0X.h>
+// Authors: Brayton Niccum
 
-#define MASK(x) (1UL << (x))
-#define LED_SHIFT_MASK (5)
+
+#include <Arduino.h>
+#include <global.h>
+#include <VL53L0X.h>
+#include <IntervalTimer.h>
 
 
 // ToF
@@ -19,14 +21,17 @@
 #define SCL0 (19)
 #define SDA0 (20)
 
-#define HIGH_ACCURACY_MODE (200000)
-#define DEFAULT_MODE (33000)
-#define HIGH_SPEED_MODE (20000) 
+#define HIGH_ACCURACY_MODE (200000) //value in microseconds
+#define DEFAULT_MODE (33000)        //value in microseconds
+#define HIGH_SPEED_MODE (20000)     //value in microseconds
 // End ToF
 
 VL53L0X NorthSensor;
 VL53L0X EastSensor;
 VL53L0X WestSensor;
+
+IntervalTimer sensorTimer;
+bool SensorStatus = false;
 
 // set correct I2C bus and enable it 
 void configure_I2C(){
@@ -52,10 +57,31 @@ void configure_tof_xshut_pins()
   GPIOD_PCOR |= ~MASK(WEST_XSHUT_PIN_MASK);
 }
 
+void SetFlag()
+{
+  SensorStatus = true;
+}
+
+
+
+void ReadSensors()
+{
+  float north_reading = NorthSensor.readRangeSingleMillimeters()/25.4001;
+  float east_reading = EastSensor.readRangeSingleMillimeters()/25.4001;
+  float west_reading = WestSensor.readRangeSingleMillimeters()/25.4001;
+  
+  Serial.printf("North: %f East: %f West: %f \n", north_reading, east_reading, west_reading);
+}
+
 void setup() {
+  PORTC_PCR5 = PORT_PCR_MUX(0x1);
+
+  // configure portc pin 5 to be an output
+  GPIOC_PDDR |= MASK(5);
   Serial.begin(9600);
   configure_tof_xshut_pins();
   configure_I2C();
+
 
   // Turn on first sensor 
   GPIOC_PDOR |= MASK(NORTH_XSHUT_PIN_MASK);
@@ -93,16 +119,17 @@ void setup() {
   NorthSensor.setMeasurementTimingBudget(DEFAULT_MODE);
   EastSensor.setMeasurementTimingBudget(DEFAULT_MODE);
   WestSensor.setMeasurementTimingBudget(DEFAULT_MODE);
-
+  sensorTimer.begin(SetFlag, DEFAULT_MODE);
 }
 
 void loop() {
-  Serial.print("North ");
-  Serial.print(NorthSensor.readRangeSingleMillimeters()/25.4001);
-  Serial.print(" East ");
-  Serial.print(EastSensor.readRangeSingleMillimeters()/25.4001);
-  Serial.print(" West ");
-  Serial.print(WestSensor.readRangeSingleMillimeters()/25.4001);
-  Serial.println("");
-  delay(DEFAULT_MODE/1000);
+    if (SensorStatus)
+    {
+      noInterrupts();
+      SensorStatus = false;
+      interrupts();
+      ReadSensors();
+    }
+    GPIOC_PDOR ^= MASK(5);
+    Serial.println("\n blink \n");
 }
