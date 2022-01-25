@@ -131,5 +131,5 @@ void loop() {
       ReadSensors();
     }
     GPIOC_PDOR ^= MASK(5);
-    Serial.println("\n blink \n");
+    //Serial.println("\n blink \n");
 }
