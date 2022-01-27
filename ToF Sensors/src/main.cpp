@@ -70,7 +70,7 @@ void ReadSensors()
   float east_reading = EastSensor.readRangeSingleMillimeters()/25.4001;
   float west_reading = WestSensor.readRangeSingleMillimeters()/25.4001;
   
-  Serial.printf("North: %f East: %f West: %f \n", north_reading, east_reading, west_reading);
+  Serial.printf("North: %f \n East: %f \n West: %f \n\n", north_reading, east_reading, west_reading);
 }
 
 void setup() {
