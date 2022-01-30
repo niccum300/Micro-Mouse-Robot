@@ -4,7 +4,7 @@
 #include <VL53L0X.h>
 #include <global.h>
 
-enum IO_STATE {ON, OFF}
+enum IO_STATE {ON, OFF};
 
 class TOF
 {
@@ -15,7 +15,7 @@ class TOF
         // shutdown io refers to the state of the shutdown pin for the VL53L0X sensor
         // the pin is active low meaing a logic 0 turns the sensor
         void setShutdownIOState(IO_STATE p_state);
-        void getShutdownIOState()
+        void getShutdownIOState();
 
     private:
         void configureShutdownIO();
