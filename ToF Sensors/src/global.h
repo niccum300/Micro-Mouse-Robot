@@ -6,4 +6,7 @@
 #define LED_SHIFT_MASK (5)
 #define IO_MUX_MASK (1)
 
+
+// error constant for sensor
+
 #endif

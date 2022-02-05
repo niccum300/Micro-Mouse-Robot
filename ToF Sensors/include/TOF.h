@@ -1,32 +1,53 @@
-#ifndef TOF_H
-#define TOF_H
+#ifndef SENSOR_H
+#define _H
 
 #include <VL53L0X.h>
 #include <global.h>
+#include <SENSOR_DATA.h>
+
+#define SCL0 (19)
+#define SDA0 (20)
+
+#define HIGH_ACCURACY_MODE (200000) //value in microseconds
+#define DEFAULT_MODE (33000)        //value in microseconds
+#define HIGH_SPEED_MODE (20000)     //value in microseconds
+
+#define SENSOR_DEVIATION  (0.07)
+
+#define MILIMETERS_INCHES (25.4001)
+
 
 enum IO_STATE {ON, OFF};
 
 class TOF
 {
     public:
-        TOF(int *p_pcr_reg, int *p_pddr_reg, int *p_pdor_reg, int p_pin_mask, int p_i2c_addr);
+        TOF(volatile uint32_t * p_pcr_reg, volatile uint32_t * p_pddr_reg, volatile uint32_t * p_pdor_reg, 
+        int p_pin_mask, int p_i2c_addr, SENSOR_LOCATION p_sensor_id);
         
         void Init();
         // shutdown io refers to the state of the shutdown pin for the VL53L0X sensor
         // the pin is active low meaing a logic 0 turns the sensor
-        void setShutdownIOState(IO_STATE p_state);
-        void getShutdownIOState();
+        void SetShutdownIOState(IO_STATE p_state);
+        void GetShutdownIOState();
+        void Update();
+        SENSOR_DATA GetData();
+
 
     private:
         void configureShutdownIO();
+        void filterRawData();
+        void getRawData();
 
     private:
         VL53L0X m_vl530x;
-        int *m_pcr_reg;
-        int *m_pdder_reg;
-        int *m_pdor_reg;
+        volatile uint32_t *m_pcr_reg;
+        volatile uint32_t *m_pdder_reg;
+        volatile uint32_t *m_pdor_reg;
         int m_pin_mask;
         int m_i2c_addr;
+        SENSOR_LOCATION m_sensor_id;
+        SENSOR_DATA m_data;
 
         IO_STATE m_io_state;
 };
