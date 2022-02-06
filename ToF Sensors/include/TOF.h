@@ -9,6 +9,7 @@
 #define SDA0 (20)
 
 #define HIGH_ACCURACY_MODE (200000) //value in microseconds
+#define MEDIUM_ACCURACY_MODE (200000) //value in microseconds
 #define DEFAULT_MODE (33000)        //value in microseconds
 #define HIGH_SPEED_MODE (20000)     //value in microseconds
 

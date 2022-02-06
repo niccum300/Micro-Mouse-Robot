@@ -12,13 +12,8 @@ TOF::TOF(volatile uint32_t *p_pcr_reg, volatile uint32_t *p_pddr_reg, volatile u
 {
 }
 
-
 void TOF::Init()
 {
-  	//configureShutdownIO();
-
-	//SetShutdownIOState(ON);
-
 	if (!m_vl530x.init())
  	{
     Serial.printf("Failed to detect and initalze sensor %d! \n", m_sensor_id);
@@ -50,6 +45,7 @@ void TOF::Update(){
 
 SENSOR_DATA TOF::GetData()
 {
+	Update();
 	return m_data;
 }
 
