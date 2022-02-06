@@ -5,8 +5,7 @@
 #include <TOF.h>
 
 // public methods
-TOF::TOF(volatile uint32_t *p_pcr_reg, volatile uint32_t *p_pddr_reg, volatile uint32_t *p_pdor_reg, 
-	int p_pin_mask, int p_i2c_addr, SENSOR_LOCATION p_sensor_id)
+TOF::TOF(volatile uint32_t *p_pcr_reg, volatile uint32_t *p_pddr_reg, volatile uint32_t *p_pdor_reg, int p_pin_mask, int p_i2c_addr, SENSOR_LOCATION p_sensor_id)
     :m_pcr_reg(p_pcr_reg), m_pdder_reg(p_pddr_reg), m_pdor_reg(p_pdor_reg), 
     m_pin_mask(p_pin_mask), m_i2c_addr(p_i2c_addr), m_sensor_id(p_sensor_id)
 {
