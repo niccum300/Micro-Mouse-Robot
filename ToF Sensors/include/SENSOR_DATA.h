@@ -10,4 +10,10 @@ struct SENSOR_DATA{
 
 enum SENSOR_LOCATION {LEFT = 0, RIGHT = 1, FRONT = 2};
 
+struct SENSOR_DATA_BUNDLE{
+    SENSOR_DATA front;
+    SENSOR_DATA left;
+    SENSOR_DATA right;
+};
+
 #endif

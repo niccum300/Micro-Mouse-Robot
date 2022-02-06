@@ -1,9 +1,7 @@
 // Authors: Brayton Niccum
-#include <Arduino.h>
 #include <IntervalTimer.h>
 
 #include <global.h>
-#include <SENSOR_DATA.h>
 #include <TOF.h>
 #include <Motor.h>
 
@@ -29,11 +27,12 @@ TOF FrontSensor(&PORTC_PCR2, &GPIOC_PDDR, &GPIOC_PDOR, MASK(FRONT_XSHUT_PIN_MASK
 TOF LeftSensor(&PORTC_PCR1, &GPIOC_PDDR, &GPIOC_PDOR, MASK(LEFT_XSHUT_PIN_MASK), LEFT_SENSOR_ADDRESS, LEFT);
 TOF RightSensor(&PORTD_PCR6, &GPIOD_PDDR, &GPIOD_PCOR, MASK(RIGHT_XSHUT_PIN_MASK), RIGHT_SENSOR_ADDRESS, RIGHT);
 SENSOR_DATA sensor_data[3];
+SENSOR_DATA_BUNDLE sensor_data_bundle;
 
-Motor FrontRightMotor(FRONT_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
-Motor FrontLeftMotor(FRONT_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
-Motor BackRightMotor(BACK_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
-Motor BackLeftMotor(BACK_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
+Motor FrontRightMotor(FRONT_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, FRONT_RIGHT);
+Motor FrontLeftMotor(FRONT_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, FRONT_LEFT);
+Motor BackRightMotor(BACK_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, BACK_RIGHT);
+Motor BackLeftMotor(BACK_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, BACK_LEFT);
 
 IntervalTimer sensorTimer;
 bool SensorStatus = false;
@@ -94,9 +93,18 @@ void ReadSensors()
   sensor_data[FRONT] = FrontSensor.GetData();
   sensor_data[LEFT] = LeftSensor.GetData();
   sensor_data[RIGHT] = RightSensor.GetData();
+
+  sensor_data_bundle.front = sensor_data[FRONT];
+  sensor_data_bundle.left = sensor_data[LEFT];
+  sensor_data_bundle.right = sensor_data[RIGHT];
   
-  Serial.printf("FRONT: %f LEFT: %f RIGHT: %f \n", sensor_data[FRONT].average, sensor_data[LEFT].average, sensor_data[RIGHT].average);
-  Serial.printf("Data Points %d", sensor_data[FRONT].total_data_points);
+  FrontRightMotorQ.Push(sensor_data_bundle);
+  FrontLeftMotorQ.Push(sensor_data_bundle);
+  BackLeftMotorQ.Push(sensor_data_bundle);
+  BackRightMotorQ.Push(sensor_data_bundle);
+  
+  //Serial.printf("FRONT: %f LEFT: %f RIGHT: %f \n", sensor_data[FRONT].average, sensor_data[LEFT].average, sensor_data[RIGHT].average);
+  //Serial.printf("Data Points %d", sensor_data[FRONT].total_data_points);
 }
 
 void startSensors()
