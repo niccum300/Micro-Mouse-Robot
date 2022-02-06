@@ -5,7 +5,17 @@
 #include <global.h>
 #include <SENSOR_DATA.h>
 #include <TOF.h>
+#include <Motor.h>
 
+//Motor
+#define FRONT_RIGHT_MOTOR_PIN (2)
+#define FRONT_LEFT_MOTOR_PIN (3)
+#define BACK_RIGHT_MOTOR_PIN (4)
+#define BACK_LEFT_MOTOR_PIN (5)
+
+#define PWM_RESOULTION_32_BIT (65535)
+
+// TOF
 #define FRONT_XSHUT_PIN_MASK (0x2)
 #define FRONT_SENSOR_ADDRESS (0x10)
 
@@ -19,6 +29,11 @@ TOF FrontSensor(&PORTC_PCR2, &GPIOC_PDDR, &GPIOC_PDOR, MASK(FRONT_XSHUT_PIN_MASK
 TOF LeftSensor(&PORTC_PCR1, &GPIOC_PDDR, &GPIOC_PDOR, MASK(LEFT_XSHUT_PIN_MASK), LEFT_SENSOR_ADDRESS, LEFT);
 TOF RightSensor(&PORTD_PCR6, &GPIOD_PDDR, &GPIOD_PCOR, MASK(RIGHT_XSHUT_PIN_MASK), RIGHT_SENSOR_ADDRESS, RIGHT);
 SENSOR_DATA sensor_data[3];
+
+Motor FrontRightMotor(FRONT_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
+Motor FrontLeftMotor(FRONT_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
+Motor BackRightMotor(BACK_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
+Motor BackLeftMotor(BACK_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT);
 
 IntervalTimer sensorTimer;
 bool SensorStatus = false;
@@ -45,9 +60,10 @@ void setup() {
   Serial.begin(9600);
   configure_tof_xshut_pins();
   
-  Wire.setSCL(SCL0);
-  Wire.setSDA(SDA0);
-  Wire.begin();
+  FrontRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.25);
+  FrontLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.50);
+  BackRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.75);
+  BackLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT);
   
   startSensors();
 
@@ -63,6 +79,11 @@ void loop() {
       interrupts();
       ReadSensors();
     }
+
+    FrontRightMotor.Update();
+    FrontLeftMotor.Update();
+    BackRightMotor.Update();
+    BackLeftMotor.Update();
  
     GPIOC_PDOR ^= MASK(5);
     //Serial.println("\n blink \n");
@@ -81,6 +102,9 @@ void ReadSensors()
 void startSensors()
 {
   configure_tof_xshut_pins();
+  Wire.setSCL(SCL0);
+  Wire.setSDA(SDA0);
+  Wire.begin();
   
   GPIOC_PDOR |= MASK(FRONT_XSHUT_PIN_MASK);
   FrontSensor.Init();

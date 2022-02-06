@@ -1,5 +1,5 @@
-#ifndef SENSOR_H
-#define _H
+#ifndef TOF_H
+#define TOF_H
 
 #include <VL53L0X.h>
 #include <global.h>
