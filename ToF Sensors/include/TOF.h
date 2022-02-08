@@ -4,6 +4,7 @@
 #include <VL53L0X.h>
 #include <global.h>
 #include <SENSOR_DATA.h>
+#include <SensorQueue.h>
 
 #define SCL0 (19)
 #define SDA0 (20)
@@ -17,14 +18,13 @@
 
 #define MILIMETERS_INCHES (25.4001)
 
-
 enum IO_STATE {ON, OFF};
 
 class TOF
 {
     public:
         TOF(volatile uint32_t * p_pcr_reg, volatile uint32_t * p_pddr_reg, volatile uint32_t * p_pdor_reg, 
-        int p_pin_mask, int p_i2c_addr, SENSOR_LOCATION p_sensor_id);
+        int p_pin_mask, int p_i2c_addr, SensorQueue * p_sensor_q);
         
         void Init();
         void SetShutdownIOState(IO_STATE p_state);
@@ -44,8 +44,9 @@ class TOF
         volatile uint32_t *m_pdor_reg;
         int m_pin_mask;
         int m_i2c_addr;
-        SENSOR_LOCATION m_sensor_id;
+        SensorQueue *m_sensor_q;
         SENSOR_DATA m_data;
+        
 
         IO_STATE m_io_state;
 };

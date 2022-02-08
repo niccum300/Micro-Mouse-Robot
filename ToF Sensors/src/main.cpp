@@ -4,16 +4,16 @@
 #include <global.h>
 #include <TOF.h>
 #include <Motor.h>
+#include <SensorQueue.h>
+#include <MotorQueue.h>
+#include <MotorController.h>
 
 //Motor
 #define FRONT_RIGHT_MOTOR_PIN (2)
 #define FRONT_LEFT_MOTOR_PIN (3)
 #define BACK_RIGHT_MOTOR_PIN (4)
 #define BACK_LEFT_MOTOR_PIN (5)
-
-#define PWM_RESOULTION_32_BIT (65535)
-
-// TOF
+// 
 #define FRONT_XSHUT_PIN_MASK (0x2)
 #define FRONT_SENSOR_ADDRESS (0x10)
 
@@ -23,22 +23,31 @@
 #define RIGHT_XSHUT_PIN_MASK (0x6)
 #define RIGHT_SENSOR_ADDRESS (0x12)
 
+// Senosor Data Queues
 SensorQueue FrontSensorQ;
 SensorQueue LeftSensorQ;
 SensorQueue RightSensorQ;
 
+// Motor Data Queues
+MotorQueue FrontLeftMotorQ;
+MotorQueue FrontRightMotorQ;
+MotorQueue BackLeftMotorQ;
+MotorQueue BackRightMotorQ;
 
-TOF FrontSensor(&PORTC_PCR2, &GPIOC_PDDR, &GPIOC_PDOR, MASK(FRONT_XSHUT_PIN_MASK), FRONT_SENSOR_ADDRESS, FRONT);
-TOF LeftSensor(&PORTC_PCR1, &GPIOC_PDDR, &GPIOC_PDOR, MASK(LEFT_XSHUT_PIN_MASK), LEFT_SENSOR_ADDRESS, LEFT);
-TOF RightSensor(&PORTD_PCR6, &GPIOD_PDDR, &GPIOD_PCOR, MASK(RIGHT_XSHUT_PIN_MASK), RIGHT_SENSOR_ADDRESS, RIGHT);
+TOF FrontSensor(&PORTC_PCR2, &GPIOC_PDDR, &GPIOC_PDOR, MASK(FRONT_XSHUT_PIN_MASK), FRONT_SENSOR_ADDRESS, &FrontSensorQ);
+TOF LeftSensor(&PORTC_PCR1, &GPIOC_PDDR, &GPIOC_PDOR, MASK(LEFT_XSHUT_PIN_MASK), LEFT_SENSOR_ADDRESS, &LeftSensorQ);
+TOF RightSensor(&PORTD_PCR6, &GPIOD_PDDR, &GPIOD_PCOR, MASK(RIGHT_XSHUT_PIN_MASK), RIGHT_SENSOR_ADDRESS, &RightSensorQ);
 
-Motor FrontRightMotor(FRONT_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, FRONT_RIGHT);
-Motor FrontLeftMotor(FRONT_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, FRONT_LEFT);
-Motor BackRightMotor(BACK_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, BACK_RIGHT);
-Motor BackLeftMotor(BACK_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, BACK_LEFT);
+Motor FrontRightMotor(FRONT_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &FrontRightMotorQ);
+Motor FrontLeftMotor(FRONT_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &FrontLeftMotorQ);
+Motor BackRightMotor(BACK_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &BackRightMotorQ);
+Motor BackLeftMotor(BACK_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &BackLeftMotorQ);
+
+MotorController motorController;
 
 IntervalTimer sensorTimer;
 bool SensorStatus = false;
+bool Driving = false;
 
 // configure pins to output for shutting down each ToF
 // the xshut pin is active low
@@ -49,6 +58,11 @@ void UpdateMotors();
 void SetFlag()
 {
   SensorStatus = true;
+
+  if (Driving == false)
+  {
+      Driving = true;
+  }
 }
 
 void setup() {
@@ -60,10 +74,10 @@ void setup() {
   Serial.begin(9600);
   configure_tof_xshut_pins();
   
-  FrontRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.50);
-  FrontLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.50);
-  BackRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.50);
-  BackLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT* .50);
+  FrontRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.25);
+  FrontLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.25);
+  BackRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.25);
+  BackLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT* .25);
   
   startSensors();
 
@@ -80,7 +94,12 @@ void loop() {
       ReadSensors();
     }
 
-    UpdateMotors();
+    if (Driving)
+    {
+      motorController.Update();
+      UpdateMotors();
+    }
+
  
     GPIOC_PDOR ^= MASK(5);
    // Serial.println("\n blink \n");

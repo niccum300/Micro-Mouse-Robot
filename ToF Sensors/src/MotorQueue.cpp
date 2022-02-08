@@ -1,11 +1,11 @@
-#include <SensorQueue.h>
+#include <MotorQueue.h>
 
 // public
-SensorQueue::SensorQueue()
+MotorQueue::MotorQueue()
 {
 }
 
-bool SensorQueue::Push(SENSOR_QUEUE_TYPE p_in)
+bool MotorQueue::Push(MOTOR_QUEUE_TYPE p_in)
 {
     if(isFull()) return false;
 
@@ -17,11 +17,11 @@ bool SensorQueue::Push(SENSOR_QUEUE_TYPE p_in)
     return true;
 }
 
-SENSOR_QUEUE_TYPE SensorQueue::Pop()
+MOTOR_QUEUE_TYPE MotorQueue::Pop()
 {
     if(!isEmpty())
     {
-        SENSOR_QUEUE_TYPE value = m_queue[m_front];
+        MOTOR_QUEUE_TYPE value = m_queue[m_front];
         m_front++;
 
         if (m_front > m_rear){
@@ -33,7 +33,7 @@ SENSOR_QUEUE_TYPE SensorQueue::Pop()
     }
 }
 
-SENSOR_QUEUE_TYPE SensorQueue::Peak()
+MOTOR_QUEUE_TYPE MotorQueue::Peak()
 {
     if(!isEmpty())
     {
@@ -41,14 +41,14 @@ SENSOR_QUEUE_TYPE SensorQueue::Peak()
     }
 }
 
-void SensorQueue::Reset()
+void MotorQueue::Reset()
 {
     m_front = -1;
     m_rear = -1;
 }
 
 // private
-bool SensorQueue::isFull()
+bool MotorQueue::isFull()
 {
     if(m_front == 0 && m_rear == MAX_SIZE - 1)
     {
@@ -58,7 +58,7 @@ bool SensorQueue::isFull()
     return false;
 }
 
-bool SensorQueue::isEmpty()
+bool MotorQueue::isEmpty()
 {
     if(m_front == -1) return true;
 

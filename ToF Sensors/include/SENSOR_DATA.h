@@ -8,8 +8,6 @@ struct SENSOR_DATA{
   float new_data_point = 0.0000;
 };
 
-enum SENSOR_LOCATION {LEFT = 0, RIGHT = 1, FRONT = 2};
-
 struct SENSOR_DATA_BUNDLE{
     SENSOR_DATA front;
     SENSOR_DATA left;

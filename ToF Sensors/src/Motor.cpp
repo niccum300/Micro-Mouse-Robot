@@ -3,28 +3,17 @@
 
 #include <Motor.h>
 
-extern SensorQueue FrontSensorQ;
-extern SensorQueue LeftSensorQ;
-extern SensorQueue RightSensorQ;
-
 // public 
-Motor::Motor(int p_pin, int p_resolution, MOTOR_LOCATION p_motor_loc)
-    :m_pin(p_pin), m_resolution(p_resolution), m_motor_loc(p_motor_loc)
+Motor::Motor(int p_pin, int p_resolution, MotorQueue * p_motor_q)
+    :m_pin(p_pin), m_resolution(p_resolution), m_motor_q(p_motor_q)
 {   
     setupPinOutput();
 }
 
 void Motor::Update()
 {
-    SENSOR_DATA_BUNDLE bundle;
-    bundle.front = FrontSensorQ.Pop();
-    bundle.left = LeftSensorQ.Pop();
-    bundle.right = RightSensorQ.Pop(); 
-
-
-    Serial.printf(" \n Motor %d | Values %f | %f | %f", m_motor_loc, bundle.front.average, bundle.left.average, bundle.right.average);
-
-
+    SetDutyCycle(m_motor_q->Pop());
+    Serial.printf("Motor: %f \n", m_duty_cycle);
     analogWrite(m_pin, m_duty_cycle);
 }
 
