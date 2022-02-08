@@ -27,6 +27,7 @@ class TOF
         int p_pin_mask, int p_i2c_addr, SENSOR_LOCATION p_sensor_id);
         
         void Init();
+        void SetShutdownIOState(IO_STATE p_state);
         void GetShutdownIOState();
         void Update();
         SENSOR_DATA GetData();
