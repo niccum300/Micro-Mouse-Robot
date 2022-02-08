@@ -9,10 +9,10 @@
 #include <MotorController.h>
 
 //Motor
-#define FRONT_RIGHT_MOTOR_PIN (2)
-#define FRONT_LEFT_MOTOR_PIN (3)
-#define BACK_RIGHT_MOTOR_PIN (4)
-#define BACK_LEFT_MOTOR_PIN (5)
+#define FRONT_RIGHT_MOTOR_PIN (29)
+#define FRONT_LEFT_MOTOR_PIN (30)
+#define BACK_RIGHT_MOTOR_PIN (6)
+#define BACK_LEFT_MOTOR_PIN (9)
 // 
 #define FRONT_XSHUT_PIN_MASK (0x2)
 #define FRONT_SENSOR_ADDRESS (0x10)
@@ -70,16 +70,12 @@ void setup() {
 
   // configure portc pin 5 to be an output
   GPIOC_PDDR |= MASK(5);
+    
 
   Serial.begin(9600);
   configure_tof_xshut_pins();
-  
-  FrontRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.25);
-  FrontLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.25);
-  BackRightMotor.SetDutyCycle(PWM_RESOULTION_32_BIT*.25);
-  BackLeftMotor.SetDutyCycle(PWM_RESOULTION_32_BIT* .25);
-  
   startSensors();
+  motorController.Init();
 
   sensorTimer.begin(SetFlag, DEFAULT_MODE);
 }

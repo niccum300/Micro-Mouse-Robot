@@ -7,13 +7,18 @@
 #define SENSOR_COUNT (3)
 #define MOTOR_COUNT (4)
 
-#define MIN_DISTANCE (0.9)
+#define MIN_DISTANCE (4.00)
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.50)
 
+#define BACK_RIGHT_AIN2_PIN (7)
+#define BACK_RIGHT_AIN1_PIN (8)
+#define BACK_LEFT_BIN2_PIN (10)
+#define BACK_LEFT_BIN1_PIN (11)
+
 enum MOTOR_ID {FRONT_LEFT = 0, FRONT_RIGHT = 1, BACK_LEFT = 2, BACK_RIGHT = 3};
 
-enum DRIVING_STATE {DRIVING, STOP};
+enum DRIVING_STATE {DRIVING, START, STOP};
 
 #include <global.h>
 #include <SensorQueue.h>
@@ -36,6 +41,7 @@ class MotorController
 public:
     MotorController();
     void Update();
+    void Init();
 
 private:
     void aquireSensorData();
