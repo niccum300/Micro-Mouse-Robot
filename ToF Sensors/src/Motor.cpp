@@ -13,7 +13,7 @@ Motor::Motor(int p_pin, int p_resolution, MotorQueue * p_motor_q)
 void Motor::Update()
 {
     SetDutyCycle(m_motor_q->Pop());
-    Serial.printf("Motor: %f \n", m_duty_cycle);
+    //Serial.printf("Motor: %f \n", m_duty_cycle);
     analogWrite(m_pin, m_duty_cycle);
 }
 
