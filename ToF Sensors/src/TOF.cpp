@@ -4,6 +4,10 @@
 
 #include <TOF.h>
 
+extern SensorQueue FrontSensorQ;
+extern SensorQueue LeftSensorQ;
+extern SensorQueue RightSensorQ;
+
 // public methods
 TOF::TOF(volatile uint32_t *p_pcr_reg, volatile uint32_t *p_pddr_reg, volatile uint32_t *p_pdor_reg, int p_pin_mask, int p_i2c_addr, SENSOR_LOCATION p_sensor_id)
     :m_pcr_reg(p_pcr_reg), m_pdder_reg(p_pddr_reg), m_pdor_reg(p_pdor_reg), 
@@ -40,6 +44,29 @@ void TOF::SetShutdownIOState(IO_STATE p_state){
 void TOF::Update(){
 	getRawData();
 	filterRawData();
+
+	switch (m_sensor_id)
+	{
+	case FRONT:
+		FrontSensorQ.Push(m_data);
+		FrontSensorQ.Push(m_data);
+		FrontSensorQ.Push(m_data);
+		FrontSensorQ.Push(m_data);
+		break;
+	case LEFT:
+		LeftSensorQ.Push(m_data);
+		LeftSensorQ.Push(m_data);
+		LeftSensorQ.Push(m_data);
+		LeftSensorQ.Push(m_data);
+		break;
+	case RIGHT:
+		RightSensorQ.Push(m_data);
+		RightSensorQ.Push(m_data);
+		RightSensorQ.Push(m_data);
+		RightSensorQ.Push(m_data);
+		break;
+	}
+
 }
 
 SENSOR_DATA TOF::GetData()

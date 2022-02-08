@@ -7,7 +7,7 @@
 #include <SENSOR_DATA.h>
 
 #define MAX_SIZE (20)
-#define QUEUE_TYPE SENSOR_DATA_BUNDLE
+#define QUEUE_TYPE SENSOR_DATA
 
 class SensorQueue{
 public:
