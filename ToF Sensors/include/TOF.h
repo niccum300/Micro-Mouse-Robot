@@ -27,13 +27,9 @@ class TOF
         int p_pin_mask, int p_i2c_addr, SENSOR_LOCATION p_sensor_id);
         
         void Init();
-        // shutdown io refers to the state of the shutdown pin for the VL53L0X sensor
-        // the pin is active low meaing a logic 0 turns the sensor
-        void SetShutdownIOState(IO_STATE p_state);
         void GetShutdownIOState();
         void Update();
         SENSOR_DATA GetData();
-
 
     private:
         void configureShutdownIO();
