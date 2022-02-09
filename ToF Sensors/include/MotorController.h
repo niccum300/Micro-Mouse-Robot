@@ -18,7 +18,7 @@
 
 enum MOTOR_ID {FRONT_LEFT = 0, FRONT_RIGHT = 1, BACK_LEFT = 2, BACK_RIGHT = 3};
 
-enum DRIVING_STATE {DRIVING, START, STOP};
+enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT};
 
 #include <global.h>
 #include <SensorQueue.h>
@@ -44,7 +44,7 @@ public:
     void Init();
 
 private:
-    void zigzag();
+    void ZigZag();
     void aquireSensorData();
     void computeSensorData();
     void updateMotorQueues();
