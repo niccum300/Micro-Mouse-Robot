@@ -55,6 +55,7 @@ void configure_tof_xshut_pins();
 void startSensors();
 void ReadSensors();
 void UpdateMotors();
+void ZigZag();
 void SetFlag()
 {
   SensorStatus = true;
