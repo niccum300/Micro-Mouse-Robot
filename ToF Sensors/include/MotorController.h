@@ -44,6 +44,7 @@ public:
     void Init();
 
 private:
+    void zigzag();
     void aquireSensorData();
     void computeSensorData();
     void updateMotorQueues();
