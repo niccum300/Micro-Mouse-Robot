@@ -72,3 +72,29 @@ void MotorController::disableMotors()
     m_motor_data[BACK_LEFT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
     m_motor_data[BACK_RIGHT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
 }
+
+void MotorController::ZigZag()
+{
+    if (m_sensor_data[LEFT].average < m_sensor_data[RIGHT].average)
+{
+    m_driving_state = SLOWRIGHT;
+}
+
+if (m_driving_state == SLOWRIGHT){
+    m_motor_data[FRONT_LEFT] = PWM_RESOULTION_32_BIT;
+    m_motor_data[FRONT_RIGHT] = PWM_RESOULTION_32_BIT *.95;
+    m_motor_data[BACK_LEFT] = PWM_RESOULTION_32_BIT;
+    m_motor_data[BACK_RIGHT] = PWM_RESOULTION_32_BIT *.95;
+}
+if (m_sensor_data[RIGHT].average < m_sensor_data[LEFT].average)
+{
+    m_driving_state = SLOWLEFT;
+}
+
+if (m_driving_state == SLOWLEFT){
+    m_motor_data[FRONT_LEFT] = PWM_RESOULTION_32_BIT *.95;
+    m_motor_data[FRONT_RIGHT] = PWM_RESOULTION_32_BIT;
+    m_motor_data[BACK_LEFT] = PWM_RESOULTION_32_BIT *.95;
+    m_motor_data[BACK_RIGHT] = PWM_RESOULTION_32_BIT;
+}
+}
