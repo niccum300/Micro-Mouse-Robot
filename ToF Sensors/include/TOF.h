@@ -46,8 +46,6 @@ class TOF
         int m_i2c_addr;
         SensorQueue *m_sensor_q;
         SENSOR_DATA m_data;
-        
-
         IO_STATE m_io_state;
 };
 

@@ -48,7 +48,6 @@ private:
     void computeSensorData();
     void updateMotorQueues();
     void disableMotors();
-    void setDrivingState(DRIVING_STATE state);
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];

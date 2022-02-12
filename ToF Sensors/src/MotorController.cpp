@@ -50,10 +50,10 @@ void MotorController::computeSensorData()
         m_driving_state = STOP;
     }
     else if(m_driving_state == DRIVING){
-        m_motor_data[FRONT_LEFT] = PWM_RESOULTION_32_BIT;
-        m_motor_data[FRONT_RIGHT] = PWM_RESOULTION_32_BIT;
-        m_motor_data[BACK_LEFT] = PWM_RESOULTION_32_BIT;
-        m_motor_data[BACK_RIGHT] = PWM_RESOULTION_32_BIT;
+        m_motor_data[FRONT_LEFT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
+        m_motor_data[FRONT_RIGHT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
+        m_motor_data[BACK_LEFT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
+        m_motor_data[BACK_RIGHT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
     }   
 }
 
