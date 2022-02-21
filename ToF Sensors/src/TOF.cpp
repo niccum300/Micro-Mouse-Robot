@@ -22,7 +22,7 @@ void TOF::Init()
 	  }
 	m_vl530x.setAddress(m_i2c_addr);
 
-	m_vl530x.setMeasurementTimingBudget(DEFAULT_MODE);
+	m_vl530x.setMeasurementTimingBudget(HIGH_SPEED_MODE);
 
 }
 

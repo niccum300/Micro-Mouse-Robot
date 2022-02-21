@@ -77,7 +77,7 @@ void setup() {
   startSensors();
   motorController.Init();
 
-  sensorTimer.begin(SetFlag, DEFAULT_MODE);
+  sensorTimer.begin(SetFlag, HIGH_SPEED_MODE);
 }
 
 void loop() {
