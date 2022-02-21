@@ -25,8 +25,9 @@ void MotorController::Init()
 void MotorController::Update()
 {
     aquireSensorData();
-    computeSensorData();
+    //computeSensorData();
     ZigZag();
+    
     updateMotorQueues();
 }
 
@@ -76,7 +77,7 @@ void MotorController::disableMotors()
 
 void MotorController::ZigZag()
 {
-    if (m_sensor_data[FRONT].average <= MIN_DISTANCE)
+    if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT)
     {
         disableMotors();
         m_driving_state = STOP;

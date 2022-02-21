@@ -22,7 +22,7 @@ void TOF::Init()
 	  }
 	m_vl530x.setAddress(m_i2c_addr);
 
-	m_vl530x.setMeasurementTimingBudget(DEFAULT_MODE);
+	m_vl530x.setMeasurementTimingBudget(HIGH_SPEED_MODE);
 
 }
 
@@ -84,5 +84,5 @@ void TOF::filterRawData()
 
 void TOF::getRawData()
 {
-	m_data.new_data_point = m_vl530x.readRangeSingleMillimeters()/MILIMETERS_INCHES;
+	m_data.new_data_point = (m_vl530x.readRangeSingleMillimeters()/MILIMETERS_INCHES);
 }
