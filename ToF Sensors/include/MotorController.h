@@ -8,8 +8,9 @@
 #define MOTOR_COUNT (4)
 
 #define MIN_DISTANCE (4.00)
+#define MIN_DISTANCE_FRONT (7.00)
 #define MOTOR_OFF (0.00)
-#define MOTOR_HALF (0.50)
+#define MOTOR_HALF (0.40)
 
 #define BACK_RIGHT_AIN2_PIN (7)
 #define BACK_RIGHT_AIN1_PIN (8)
@@ -18,7 +19,7 @@
 
 enum MOTOR_ID {FRONT_LEFT = 0, FRONT_RIGHT = 1, BACK_LEFT = 2, BACK_RIGHT = 3};
 
-enum DRIVING_STATE {DRIVING, START, STOP};
+enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, LEFT_90};
 
 #include <global.h>
 #include <SensorQueue.h>
@@ -44,6 +45,7 @@ public:
     void Init();
 
 private:
+    void ZigZag();
     void aquireSensorData();
     void computeSensorData();
     void updateMotorQueues();

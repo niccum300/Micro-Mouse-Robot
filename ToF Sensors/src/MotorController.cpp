@@ -25,7 +25,9 @@ void MotorController::Init()
 void MotorController::Update()
 {
     aquireSensorData();
-    computeSensorData();
+    //computeSensorData();
+    ZigZag();
+    
     updateMotorQueues();
 }
 
@@ -50,10 +52,10 @@ void MotorController::computeSensorData()
         m_driving_state = STOP;
     }
     else if(m_driving_state == DRIVING){
-        m_motor_data[FRONT_LEFT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
-        m_motor_data[FRONT_RIGHT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
-        m_motor_data[BACK_LEFT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
-        m_motor_data[BACK_RIGHT] = MOTOR_HALF * PWM_RESOULTION_32_BIT;
+        m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
     }   
 }
 
@@ -71,4 +73,37 @@ void MotorController::disableMotors()
     m_motor_data[FRONT_RIGHT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
     m_motor_data[BACK_LEFT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
     m_motor_data[BACK_RIGHT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
+}
+
+void MotorController::ZigZag()
+{
+    if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT)
+    {
+        disableMotors();
+        m_driving_state = STOP;
+        return;
+    }
+
+    if (m_sensor_data[LEFT].average < m_sensor_data[RIGHT].average)
+    {
+        m_driving_state = SLOWRIGHT;
+    }
+
+    if (m_driving_state == SLOWRIGHT){
+        m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
+        m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.95;
+    }
+    if (m_sensor_data[RIGHT].average < m_sensor_data[LEFT].average)
+    {
+        m_driving_state = SLOWLEFT;
+    }
+
+    if (m_driving_state == SLOWLEFT){
+        m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
+        m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+    }
 }
