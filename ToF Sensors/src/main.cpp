@@ -4,8 +4,10 @@
 #include <global.h>
 #include <TOF.h>
 #include <Motor.h>
+#include <Gyro.h>
 #include <SensorQueue.h>
 #include <MotorQueue.h>
+#include <GyroQueue.h>
 #include <MotorController.h>
 
 //Motor
@@ -29,19 +31,20 @@ SensorQueue LeftSensorQ;
 SensorQueue RightSensorQ;
 
 // Motor Data Queues
-MotorQueue FrontLeftMotorQ;
-MotorQueue FrontRightMotorQ;
 MotorQueue BackLeftMotorQ;
 MotorQueue BackRightMotorQ;
+
+//Gyro Queue
+GyroQueue GyroQ;
 
 TOF FrontSensor(&PORTC_PCR2, &GPIOC_PDDR, &GPIOC_PDOR, MASK(FRONT_XSHUT_PIN_MASK), FRONT_SENSOR_ADDRESS, &FrontSensorQ);
 TOF LeftSensor(&PORTC_PCR1, &GPIOC_PDDR, &GPIOC_PDOR, MASK(LEFT_XSHUT_PIN_MASK), LEFT_SENSOR_ADDRESS, &LeftSensorQ);
 TOF RightSensor(&PORTD_PCR6, &GPIOD_PDDR, &GPIOD_PCOR, MASK(RIGHT_XSHUT_PIN_MASK), RIGHT_SENSOR_ADDRESS, &RightSensorQ);
 
-Motor FrontRightMotor(FRONT_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &FrontRightMotorQ);
-Motor FrontLeftMotor(FRONT_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &FrontLeftMotorQ);
 Motor BackRightMotor(BACK_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &BackRightMotorQ);
 Motor BackLeftMotor(BACK_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &BackLeftMotorQ);
+
+Gyro GyroMpu(Wire, &GyroQ);
 
 MotorController motorController;
 
@@ -75,6 +78,7 @@ void setup() {
   Serial.begin(9600);
   configure_tof_xshut_pins();
   startSensors();
+  GyroMpu.Init();
   motorController.Init();
 
   sensorTimer.begin(SetFlag, HIGH_SPEED_MODE);
@@ -96,6 +100,7 @@ void loop() {
       UpdateMotors();
     }
 
+
  
     GPIOC_PDOR ^= MASK(5);
    // Serial.println("\n blink \n");
@@ -106,12 +111,11 @@ void ReadSensors()
   FrontSensor.Update();
   LeftSensor.Update();
   RightSensor.Update();
+  GyroMpu.Update();
 }
 
 void UpdateMotors()
 {
-  FrontRightMotor.Update();
-  FrontLeftMotor.Update();
   BackRightMotor.Update();
   BackLeftMotor.Update();
 }

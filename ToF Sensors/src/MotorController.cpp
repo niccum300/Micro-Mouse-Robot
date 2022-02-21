@@ -19,13 +19,13 @@ void MotorController::Init()
     digitalWrite(BACK_LEFT_BIN1_PIN, HIGH);
     digitalWrite(BACK_LEFT_BIN2_PIN, LOW);
 
-    m_driving_state = DRIVING;
+    m_driving_state = STOP;
 }
 
 void MotorController::Update()
 {
     aquireSensorData();
-    computeSensorData();
+    //computeSensorData();
     ZigZag();
     updateMotorQueues();
 }
@@ -36,9 +36,11 @@ void MotorController::aquireSensorData()
     m_sensor_data[FRONT] = FrontSensorQ.Pop();
     m_sensor_data[LEFT]  = LeftSensorQ.Pop();
     m_sensor_data[RIGHT] = RightSensorQ.Pop();
+    m_gyro_data = GyroQ.Pop();
 
 
     Serial.printf("Front: %f | Left: %f | Right: %f \n", m_sensor_data[FRONT].average, m_sensor_data[LEFT].average, m_sensor_data[RIGHT].average);
+    Serial.printf("Gyro: %f \n", m_gyro_data);
 }
 
 void MotorController::computeSensorData()
@@ -51,8 +53,6 @@ void MotorController::computeSensorData()
         m_driving_state = STOP;
     }
     else if(m_driving_state == DRIVING){
-        m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
     }   
@@ -60,26 +60,33 @@ void MotorController::computeSensorData()
 
 void MotorController::updateMotorQueues()
 {
-    FrontLeftMotorQ.Push(m_motor_data[FRONT_LEFT]);
-    FrontRightMotorQ.Push(m_motor_data[FRONT_RIGHT]);
     BackLeftMotorQ.Push(m_motor_data[BACK_LEFT]);
     BackRightMotorQ.Push(m_motor_data[BACK_RIGHT]);
 }
 
 void MotorController::disableMotors()
 {
-    m_motor_data[FRONT_LEFT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
-    m_motor_data[FRONT_RIGHT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
     m_motor_data[BACK_LEFT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
     m_motor_data[BACK_RIGHT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
 }
 
 void MotorController::ZigZag()
 {
+    if (m_driving_state == STOP)
+    {
+        if(m_sensor_data[RIGHT].average <= MIN_DISTANCE)
+        {
+            m_driving_state = DRIVING;
+        }
+
+        return;
+    }
+    if (m_driving_state == TURN90) {turn90(); return;}
     if (m_sensor_data[FRONT].average <= MIN_DISTANCE)
     {
         disableMotors();
-        m_driving_state = STOP;
+        //m_driving_state = STOP;
+        turn90();
         return;
     }
 
@@ -89,8 +96,6 @@ void MotorController::ZigZag()
     }
 
     if (m_driving_state == SLOWRIGHT){
-        m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.95;
     }
@@ -100,9 +105,23 @@ void MotorController::ZigZag()
     }
 
     if (m_driving_state == SLOWLEFT){
-        m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
-        m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+    }
+}
+
+void MotorController::turn90()
+{
+    if (m_gyro_data < 90 && m_driving_state != TURN90)
+    {
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.75;
+        m_motor_data[BACK_LEFT] = MOTOR_OFF;
+
+        m_driving_state = TURN90;
+    }else if (m_gyro_data >= 90)
+    {
+        m_driving_state = DRIVING;
+        m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
     }
 }
