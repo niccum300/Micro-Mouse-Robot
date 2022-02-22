@@ -7,7 +7,7 @@
 #define SENSOR_COUNT (3)
 #define MOTOR_COUNT (2)
 
-#define MIN_DISTANCE (6.50)
+#define MIN_DISTANCE (7.00)
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.45)
 
@@ -18,7 +18,7 @@
 
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
-enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURN90};
+enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT};
 
 #include <global.h>
 #include <SensorQueue.h>
@@ -53,11 +53,13 @@ private:
     void updateMotorQueues();
     void disableMotors();
     void setDrivingState(DRIVING_STATE state);
-    void turn90();
+    void turnLeft();
+    void turnRight();
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];
     float m_gyro_data;
+    float m_initial = 0;
     DRIVING_STATE m_driving_state;
 
 };
