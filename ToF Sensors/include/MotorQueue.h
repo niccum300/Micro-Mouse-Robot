@@ -15,7 +15,7 @@ public:
     MOTOR_QUEUE_TYPE Peak();
     void Reset();
 
-private:
+
     bool isFull();
     bool isEmpty();
 

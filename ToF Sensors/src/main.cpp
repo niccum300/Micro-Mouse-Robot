@@ -79,6 +79,8 @@ void setup() {
   configure_tof_xshut_pins();
   startSensors();
   GyroMpu.Init();
+  BackLeftMotor.SetDutyCycle(0);
+  BackRightMotor.SetDutyCycle(0);
   motorController.Init();
 
   sensorTimer.begin(SetFlag, HIGH_SPEED_MODE);
@@ -92,16 +94,10 @@ void loop() {
       SensorStatus = false;
       interrupts();
       ReadSensors();
-    }
-
-    if (Driving)
-    {
       motorController.Update();
       UpdateMotors();
     }
 
-
- 
     GPIOC_PDOR ^= MASK(5);
    // Serial.println("\n blink \n");
 }
