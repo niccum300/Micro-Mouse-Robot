@@ -14,10 +14,10 @@ void MotorController::Init()
     pinMode(BACK_LEFT_BIN1_PIN, OUTPUT);
     pinMode(BACK_LEFT_BIN2_PIN, OUTPUT);
 
-    digitalWrite(BACK_RIGHT_AIN1_PIN, LOW);
-    digitalWrite(BACK_RIGHT_AIN2_PIN, HIGH);
-    digitalWrite(BACK_LEFT_BIN1_PIN, LOW);
-    digitalWrite(BACK_LEFT_BIN2_PIN, HIGH);
+    digitalWrite(BACK_RIGHT_AIN1_PIN, HIGH);
+    digitalWrite(BACK_RIGHT_AIN2_PIN, LOW);
+    digitalWrite(BACK_LEFT_BIN1_PIN, HIGH);
+    digitalWrite(BACK_LEFT_BIN2_PIN, LOW);
 
     m_driving_state = DRIVING;
 }
