@@ -114,31 +114,32 @@ void MotorController::ZigZag()
 
 void MotorController::turnLeft()
 {
-    if (m_sensor_data[LEFT].average >= 10.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
+    if (m_sensor_data[LEFT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
     {
         m_initial = m_gyro_data;
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.75;
         m_motor_data[BACK_LEFT] = MOTOR_OFF;
 
         m_driving_state = TURNLEFT;
-    }else if (m_gyro_data >= m_initial + 90)
+    }else if (m_gyro_data >= m_initial + 90 && m_driving_state == TURNLEFT)
     {
         m_driving_state = DRIVING;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_gyro_data = 0;
     }
 }
 
 void MotorController::turnRight()
 {
-    if (m_sensor_data[RIGHT].average >= 10.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
+    if (m_sensor_data[RIGHT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
     {
         m_initial = m_gyro_data;
         m_motor_data[BACK_RIGHT] = MOTOR_OFF;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.75;
 
         m_driving_state = TURNRIGHT;
-    }else if (m_gyro_data <= m_initial - 90)
+    }else if (m_gyro_data <= m_initial - 90 && m_driving_state == TURNRIGHT)
     {
         m_driving_state = DRIVING;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
