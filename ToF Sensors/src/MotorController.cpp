@@ -54,13 +54,13 @@ void MotorController::updateDrivingState()
     switch (m_driving_state)
     {
     case START:
+        Serial.print("start");
         disableMotors();
-        if (checkStartSignal()) {
-            m_driving_state = STRAIGHT;
-            m_gyro_bearing = m_gyro_data;
-            m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-            m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        }
+        m_driving_state = STRAIGHT;
+        m_gyro_bearing = m_gyro_data;
+        Init();
+        m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         break;
 
     case STOP:
@@ -104,12 +104,16 @@ void MotorController::updateDrivingState()
 
 bool MotorController::checkStartSignal()
 {
+    Serial.println(checkForFrontCollision());
     return checkForFrontCollision();
 }
 
 void MotorController::disableMotors()
 {
-    m_driving_state = STOP;
+    if (m_driving_state != START)
+    {
+        m_driving_state = STOP;
+    }
     m_motor_data[BACK_LEFT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
     m_motor_data[BACK_RIGHT] = MOTOR_OFF * PWM_RESOULTION_32_BIT;
 }
@@ -143,6 +147,7 @@ void MotorController::updateSensorPriority()
             if (!checkForFrontCollision() || !checkForLeftCollision() || !checkForRightCollision())
             {
                 m_sensor_priority = GYRO;
+                m_gyro_bearing = m_gyro_data;
             }
         break;
     
@@ -163,37 +168,55 @@ void MotorController::determineNextAction()
 {
     if (checkForFrontCollision())
     {
-        if (checkForRightCollision() && !checkForLeftCollision()) 
+        if (checkForLeftCollision() && checkForRightCollision())
+        {
+            disableMotors();
+            return;
+        }
+        else if (checkForRightCollision() && !checkForLeftCollision()) 
         {
             turnLeft();
-        }else if (checkForLeftCollision() && !checkForRightCollision())
+            return;
+        }
+        else if (checkForLeftCollision() && !checkForRightCollision())
         {
             turnRight();
+            return;
         }else{
-            disableMotors();
+                m_motor_data[BACK_LEFT] = (0.1 * PWM_RESOULTION_32_BIT);
+                m_motor_data[BACK_RIGHT] = (0.1 * PWM_RESOULTION_32_BIT);
         }
-        return;
-    }else{
+    }    
+    else
+    {
         centerInCorridor();
+        return;
     }
-
+    
 }
 
 void MotorController::updateBearing()
 {
-    if ((m_gyro_data + 2.00) > m_gyro_bearing)
+    Serial.printf("\ndiff %f \n", m_gyro_data  - m_gyro_bearing);
+    Serial.printf("\ndiff %f \n", m_gyro_bearing);
+    if (m_gyro_bearing - m_gyro_data < 0)
     {
-        m_motor_data[BACK_LEFT] = m_motor_data[BACK_LEFT] + (MOTOR_HALF * PWM_RESOULTION_32_BIT) * 0.1;
-        m_motor_data[BACK_RIGHT] = m_motor_data[BACK_RIGHT] - (MOTOR_HALF * PWM_RESOULTION_32_BIT) * 0.1;
+        m_motor_data[BACK_LEFT] = ((MOTOR_HALF * PWM_RESOULTION_32_BIT) +  ((MOTOR_HALF * PWM_RESOULTION_32_BIT)*0.1));
+        m_motor_data[BACK_RIGHT] = ((MOTOR_HALF * PWM_RESOULTION_32_BIT) -  ((MOTOR_HALF * PWM_RESOULTION_32_BIT)*0.1));
         return;
     }
 
-    if ((m_gyro_data - 2.00) < m_gyro_bearing)
+    if (m_gyro_bearing - m_gyro_data > 0)
     {
-        m_motor_data[BACK_LEFT] = m_motor_data[BACK_LEFT] - (MOTOR_HALF * PWM_RESOULTION_32_BIT) * 0.1;
-        m_motor_data[BACK_RIGHT] = m_motor_data[BACK_RIGHT] + (MOTOR_HALF * PWM_RESOULTION_32_BIT) * 0.1;
+        Serial.print("negative gyro");
+        m_motor_data[BACK_LEFT] = ((MOTOR_HALF * PWM_RESOULTION_32_BIT) -  ((MOTOR_HALF * PWM_RESOULTION_32_BIT)*0.1));
+        m_motor_data[BACK_RIGHT] = ((MOTOR_HALF * PWM_RESOULTION_32_BIT) +  ((MOTOR_HALF * PWM_RESOULTION_32_BIT)*0.1));
         return;
     }
+
+
+    m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+    m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
 }
 
 void MotorController::centerInCorridor()
@@ -214,9 +237,9 @@ void MotorController::turnLeft()
 {
     if (m_driving_state != TURNLEFT)
     {
-        m_driving_state = TURNRIGHT;
+        m_driving_state = TURNLEFT;
         m_initial = m_gyro_data;
-        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.75;
+        m_motor_data[BACK_RIGHT] = (PWM_RESOULTION_32_BIT * MOTOR_HALF);
         m_motor_data[BACK_LEFT] = MOTOR_OFF;
     }
 
@@ -234,7 +257,7 @@ void MotorController::turnRight()
         m_driving_state = TURNRIGHT;
         m_initial = m_gyro_data;
         m_motor_data[BACK_RIGHT] = MOTOR_OFF;
-        m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.75;
+        m_motor_data[BACK_LEFT] = (PWM_RESOULTION_32_BIT * MOTOR_HALF);
     }
 
     if (m_gyro_data <= m_initial - 90)

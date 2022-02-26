@@ -82,7 +82,7 @@ void setup() {
   GyroMpu.Init();
   BackLeftMotor.SetDutyCycle(0);
   BackRightMotor.SetDutyCycle(0);
-  motorController.Init();
+  //motorController.Init();
 
   sensorTimer.begin(SetFlag, HIGH_SPEED_MODE);
 }
