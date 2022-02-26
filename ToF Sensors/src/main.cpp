@@ -69,6 +69,7 @@ void SetFlag()
 }
 
 void setup() {
+  
   PORTC_PCR5 = PORT_PCR_MUX(0x1);
 
   // configure portc pin 5 to be an output
