@@ -8,7 +8,7 @@
 #define LED_SHIFT_MASK (5)
 #define IO_MUX_MASK (1)
 
-#define PWM_RESOULTION_32_BIT (65535)
+#define PWM_RESOULTION_32_BIT (255)
 
 enum SENSOR_LOCATION {LEFT = 0, FRONT = 1, RIGHT = 2};
 

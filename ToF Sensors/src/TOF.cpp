@@ -15,8 +15,7 @@ void TOF::Init()
 {
 	if (!m_vl530x.init())
  	{
-    Serial.printf("Failed to detect and initalze sensor on pin %d! \n", m_pin_mask);
-    while (1){}
+    while (1){Serial.printf("Failed to detect and initalze sensor on pin %d! \n", m_pin_mask);}
   	}else {
 		  Serial.printf("initalzed sensor on pin %d! \n", m_pin_mask);
 	  }

@@ -8,7 +8,7 @@
 #define MOTOR_COUNT (2)
 
 #define MIN_DISTANCE_FRONT (7.00)
-#define MIN_DISTANCE (7.00)
+#define MIN_DISTANCE (1.25)
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.45)
 
@@ -56,11 +56,14 @@ private:
     void setDrivingState(DRIVING_STATE state);
     void turnLeft();
     void turnRight();
+    void useGyro();
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];
     float m_gyro_data;
     float m_initial = 0;
+    float m_adjust_factor = 1.00;
+    float m_bearing = 0.00;
     DRIVING_STATE m_driving_state;
 
 };
