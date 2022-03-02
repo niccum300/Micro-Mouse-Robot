@@ -21,12 +21,27 @@ void MotorController::Init()
 
     m_driving_state = STOP;
 }
+void MotorController::ReverseInit()
+{
+    // nicks code for driver controlls
+    pinMode(BACK_RIGHT_AIN1_PIN, OUTPUT); //
+    pinMode(BACK_RIGHT_AIN2_PIN, OUTPUT);
+    pinMode(BACK_LEFT_BIN1_PIN, OUTPUT);
+    pinMode(BACK_LEFT_BIN2_PIN, OUTPUT);
 
+    digitalWrite(BACK_RIGHT_AIN1_PIN, LOW);
+    digitalWrite(BACK_RIGHT_AIN2_PIN, HIGH);
+    digitalWrite(BACK_LEFT_BIN1_PIN, LOW);
+    digitalWrite(BACK_LEFT_BIN2_PIN, HIGH);
+
+    m_driving_state = STOP;
+}
 void MotorController::Update()
 {
     aquireSensorData();
     //computeSensorData();
     ZigZag();
+    backitup();
     updateMotorQueues();
 }
 
@@ -81,11 +96,37 @@ void MotorController::ZigZag()
 
         return;
     }
+    if (m_driving_state == REVERSE)
+    {
+        int count;
+        if (m_sensor_data[LEFT].average < m_sensor_data[RIGHT].average)
+        {
+        //m_driving_state = BACKRIGHT;
+            count=1;
+        }
+
+        if (count==1){
+            m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.75;
+            m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*8;
+        }
+        if (m_sensor_data[RIGHT].average < m_sensor_data[LEFT].average)
+        {
+            count=2;
+        }
+
+        if (count=2){
+            m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *8;
+            m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.72;
+        }
+        return;
+    }
+    //if (m_driving_state != REVERSE){
+
     if (m_driving_state == TURNLEFT) {turnLeft(); return;}
     if (m_driving_state == TURNRIGHT) {turnRight(); return;}
     if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT)
     {
-        disableMotors();
+        //disableMotors();
         //m_driving_state = STOP;
         turnLeft();
         turnRight();
@@ -99,7 +140,7 @@ void MotorController::ZigZag()
 
     if (m_driving_state == SLOWRIGHT){
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.95;
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.90;
     }
     if (m_sensor_data[RIGHT].average < m_sensor_data[LEFT].average)
     {
@@ -110,39 +151,85 @@ void MotorController::ZigZag()
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
     }
+   // }
 }
 
 void MotorController::turnLeft()
 {
-    if (m_sensor_data[LEFT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
+    if (m_sensor_data[LEFT].average >= 10.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
     {
         m_initial = m_gyro_data;
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.75;
         m_motor_data[BACK_LEFT] = MOTOR_OFF;
 
         m_driving_state = TURNLEFT;
-    }else if (m_gyro_data >= m_initial + 90 && m_driving_state == TURNLEFT)
+    }else if (m_gyro_data >= m_initial + 90)
     {
         m_driving_state = DRIVING;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_gyro_data = 0;
     }
 }
 
 void MotorController::turnRight()
 {
-    if (m_sensor_data[RIGHT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
+    if (m_sensor_data[RIGHT].average >= 10.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
     {
         m_initial = m_gyro_data;
         m_motor_data[BACK_RIGHT] = MOTOR_OFF;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.75;
 
         m_driving_state = TURNRIGHT;
-    }else if (m_gyro_data <= m_initial - 90 && m_driving_state == TURNRIGHT)
+    }else if (m_gyro_data <= m_initial - 90)
     {
         m_driving_state = DRIVING;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
     }
+}
+void MotorController::backitup()
+{   
+    //int count;
+    if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT && m_sensor_data[LEFT].average <= MIN_DISTANCE && m_sensor_data[RIGHT].average <= MIN_DISTANCE && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
+    {
+        Serial.print("jhgjgfhgmhjgj");
+        //count=1;
+        disableMotors();
+        ReverseInit();
+        m_driving_state = REVERSE;
+    }
+    // if (count==1){
+    //     ReverseInit();
+    // }
+    // while (count==1){
+    //     if (m_sensor_data[LEFT].average < m_sensor_data[RIGHT].average)
+    // {
+    //     m_driving_state = BACKRIGHT;
+    // }
+
+    // if (m_driving_state == BACKRIGHT){
+    //     m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*1;
+    //     m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.95;
+    // }
+    // if (m_sensor_data[RIGHT].average < m_sensor_data[LEFT].average)
+    // {
+    //     m_driving_state = BACKLEFT;
+    // }
+
+    // if (m_driving_state == BACKLEFT){
+    //     m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.90;
+    //     m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*1;
+    // }
+    // aquireSensorData();
+    // updateMotorQueues();
+    // turnRight();
+    // turnLeft();
+    // if (m_driving_state == TURNLEFT) {turnLeft(); 
+    //     count=0;
+    //     return;}
+    // if (m_driving_state == TURNRIGHT) {turnRight(); 
+    //     count=0;
+    //     return;}
+    //}
+    // Init();
 }

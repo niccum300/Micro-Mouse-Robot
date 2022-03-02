@@ -8,7 +8,7 @@
 #define MOTOR_COUNT (2)
 
 #define MIN_DISTANCE_FRONT (7.00)
-#define MIN_DISTANCE (7.00)
+#define MIN_DISTANCE (4.00)
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.45)
 
@@ -19,7 +19,7 @@
 
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
-enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT};
+enum DRIVING_STATE {DRIVING, START, STOP, REVERSE, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT,BACKLEFT,BACKRIGHT};
 
 #include <global.h>
 #include <SensorQueue.h>
@@ -46,6 +46,7 @@ public:
     MotorController();
     void Update();
     void Init();
+    void ReverseInit();
 
 private:
     void ZigZag();
@@ -56,6 +57,9 @@ private:
     void setDrivingState(DRIVING_STATE state);
     void turnLeft();
     void turnRight();
+    void backitup();
+    void backleft();
+    void backright();
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];
