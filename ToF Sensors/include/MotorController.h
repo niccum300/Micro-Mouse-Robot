@@ -62,7 +62,8 @@ private:
     float m_motor_data[MOTOR_COUNT];
     float m_gyro_data;
     float m_initial = 0;
-    float m_adjust_factor = 1.00;
+    float m_r_adjust_factor = 1.00;
+    float m_l_adjust_factor = 1.15;
     float m_bearing = 0.00;
     DRIVING_STATE m_driving_state;
 
