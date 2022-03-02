@@ -99,7 +99,7 @@ void MotorController::ZigZag()
 
     if (m_driving_state == SLOWRIGHT){
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.95;
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.90;
     }
     if (m_sensor_data[RIGHT].average < m_sensor_data[LEFT].average)
     {
