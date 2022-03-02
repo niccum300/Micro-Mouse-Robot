@@ -42,22 +42,22 @@ void MotorController::aquireSensorData()
     Serial.printf("Front: %f | Left: %f | Right: %f \n", m_sensor_data[FRONT].average, m_sensor_data[LEFT].average, m_sensor_data[RIGHT].average);
 }
 
-void MotorController::computeSensorData()
-{
+// void MotorController::computeSensorData()
+// {
     
-    if (m_sensor_data[FRONT].average <= MIN_DISTANCE || m_sensor_data[LEFT].average <= MIN_DISTANCE 
-    || m_sensor_data[RIGHT].average <= MIN_DISTANCE)
-    {
-        disableMotors();
-        m_driving_state = STOP;
-    }
-    else if(m_driving_state == DRIVING){
-        m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-    }   
-}
+//     if (m_sensor_data[FRONT].average <= MIN_DISTANCE || m_sensor_data[LEFT].average <= MIN_DISTANCE 
+//     || m_sensor_data[RIGHT].average <= MIN_DISTANCE)
+//     {
+//         disableMotors();
+//         m_driving_state = STOP;
+//     }
+//     else if(m_driving_state == DRIVING){
+//         m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+//         m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+//         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+//         m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
+//     }   
+// }
 
 void MotorController::updateMotorQueues()
 {
@@ -93,7 +93,7 @@ void MotorController::ZigZag()
         m_motor_data[FRONT_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
         m_motor_data[FRONT_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT) *.95;
         m_motor_data[BACK_LEFT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT);
-        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.95;
+        m_motor_data[BACK_RIGHT] = (MOTOR_HALF * PWM_RESOULTION_32_BIT)*.90;
     }
     if (m_sensor_data[RIGHT].average < m_sensor_data[LEFT].average)
     {
