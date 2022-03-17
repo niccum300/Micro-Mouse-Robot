@@ -13,16 +13,16 @@
 //Motor
 #define FRONT_RIGHT_MOTOR_PIN (29)
 #define FRONT_LEFT_MOTOR_PIN (30)
-#define BACK_RIGHT_MOTOR_PIN (6)
-#define BACK_LEFT_MOTOR_PIN (9)
+#define BACK_RIGHT_MOTOR_PIN (35)
+#define BACK_LEFT_MOTOR_PIN (37)
 // 
-#define FRONT_XSHUT_PIN_MASK (0x2)
+#define FRONT_XSHUT_PIN (23)
 #define FRONT_SENSOR_ADDRESS (0x10)
 
-#define LEFT_XSHUT_PIN_MASK (0x1)
+#define LEFT_XSHUT_PIN (22)
 #define LEFT_SENSOR_ADDRESS (0x11)
 
-#define RIGHT_XSHUT_PIN_MASK (0x6)
+#define RIGHT_XSHUT_PIN (21)
 #define RIGHT_SENSOR_ADDRESS (0x12)
 
 // Senosor Data Queues
@@ -37,9 +37,9 @@ MotorQueue BackRightMotorQ;
 //Gyro Queue
 GyroQueue GyroQ;
 
-TOF FrontSensor(&PORTC_PCR2, &GPIOC_PDDR, &GPIOC_PDOR, MASK(FRONT_XSHUT_PIN_MASK), FRONT_SENSOR_ADDRESS, &FrontSensorQ);
-TOF LeftSensor(&PORTC_PCR1, &GPIOC_PDDR, &GPIOC_PDOR, MASK(LEFT_XSHUT_PIN_MASK), LEFT_SENSOR_ADDRESS, &LeftSensorQ);
-TOF RightSensor(&PORTD_PCR6, &GPIOD_PDDR, &GPIOD_PCOR, MASK(RIGHT_XSHUT_PIN_MASK), RIGHT_SENSOR_ADDRESS, &RightSensorQ);
+TOF FrontSensor(&PORTC_PCR2, &GPIOC_PDDR, &GPIOC_PDOR, FRONT_XSHUT_PIN, FRONT_SENSOR_ADDRESS, &FrontSensorQ);
+TOF LeftSensor(&PORTC_PCR1, &GPIOC_PDDR, &GPIOC_PDOR, LEFT_XSHUT_PIN, LEFT_SENSOR_ADDRESS, &LeftSensorQ);
+TOF RightSensor(&PORTD_PCR6, &GPIOD_PDDR, &GPIOD_PCOR, RIGHT_XSHUT_PIN, RIGHT_SENSOR_ADDRESS, &RightSensorQ);
 
 Motor BackRightMotor(BACK_RIGHT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &BackRightMotorQ);
 Motor BackLeftMotor(BACK_LEFT_MOTOR_PIN, PWM_RESOULTION_32_BIT, &BackLeftMotorQ);
@@ -122,28 +122,29 @@ void startSensors()
   Wire.setSCL(SCL0);
   Wire.setSDA(SDA0);
   Wire.begin();
+
+  Serial.print("test");
   
-  GPIOC_PDOR |= MASK(FRONT_XSHUT_PIN_MASK);
+  digitalWrite(FRONT_XSHUT_PIN, HIGH);
   FrontSensor.Init();
+  Serial.print("test0");
   
-  GPIOC_PDOR |= MASK(LEFT_XSHUT_PIN_MASK);
+  digitalWrite(LEFT_XSHUT_PIN, HIGH);
   LeftSensor.Init();
-  
-  GPIOD_PDOR |= MASK(RIGHT_XSHUT_PIN_MASK);
+  Serial.print("test1");
+
+  digitalWrite(RIGHT_XSHUT_PIN, HIGH);
   RightSensor.Init();
+  Serial.print("test2");
 }
 
 void configure_tof_xshut_pins()
 {
-  // set port c pin 2 (23) to an I/O pin
-  PORTC_PCR2 = PORT_PCR_MUX(0x1);
-  PORTC_PCR1 = PORT_PCR_MUX(0x1);
-  PORTD_PCR6 = PORT_PCR_MUX(0x1);
-  // set port c pin 2 as output
-  GPIOC_PDDR |= MASK(FRONT_XSHUT_PIN_MASK);
-  GPIOC_PDDR |= MASK(LEFT_XSHUT_PIN_MASK);
-  GPIOD_PDDR |= MASK(RIGHT_XSHUT_PIN_MASK);
-  // set to low "AGAIN THE XSHUTDOWN PIN IS ACTIVE LOW"
-  GPIOC_PDOR |= ~(MASK(FRONT_XSHUT_PIN_MASK) | MASK(LEFT_XSHUT_PIN_MASK));
-  GPIOD_PCOR |= ~MASK(RIGHT_XSHUT_PIN_MASK);
+  pinMode(FRONT_XSHUT_PIN, OUTPUT);
+  pinMode(LEFT_XSHUT_PIN, OUTPUT);
+  pinMode(RIGHT_XSHUT_PIN, OUTPUT);
+
+  digitalWrite(FRONT_XSHUT_PIN, LOW);
+  digitalWrite(LEFT_XSHUT_PIN, LOW);
+  digitalWrite(RIGHT_XSHUT_PIN, LOW);
 }

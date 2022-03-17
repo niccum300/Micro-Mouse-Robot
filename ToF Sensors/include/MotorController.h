@@ -12,10 +12,11 @@
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.45)
 
-#define BACK_RIGHT_AIN2_PIN (7)
-#define BACK_RIGHT_AIN1_PIN (8)
+#define BACK_RIGHT_AIN2_PIN (33)
+#define BACK_RIGHT_AIN1_PIN (34)
 #define BACK_LEFT_BIN2_PIN (10)
-#define BACK_LEFT_BIN1_PIN (11)
+#define BACK_LEFT_BIN1_PIN (38)
+#define STANDBY_PIN (36)
 
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
