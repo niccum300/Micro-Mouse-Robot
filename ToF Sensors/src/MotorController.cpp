@@ -75,6 +75,11 @@ void MotorController::ZigZag()
         //m_driving_state = STOP;
         turnLeft();
         turnRight();
+
+        if (m_driving_state == DRIVING)
+        {
+            reverse();
+        }
         return;
     }
 
@@ -120,6 +125,10 @@ void MotorController::useGyro()
     m_motor_data[BACK_RIGHT] = right_factor + m_r_adjust_factor;
 }
 
+void MotorController::reverse(){
+    
+}
+
 void MotorController::turnLeft()
 {
     if (m_sensor_data[LEFT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
@@ -147,7 +156,7 @@ void MotorController::turnRight()
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
 
         m_driving_state = TURNRIGHT;
-    }else if (m_gyro_data <= m_initial - 85 && m_driving_state == TURNRIGHT)
+    }else if (m_gyro_data <= m_initial - 82 && m_driving_state == TURNRIGHT)
     {
         m_driving_state = DRIVING;
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;

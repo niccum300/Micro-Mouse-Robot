@@ -12,7 +12,7 @@
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.45)
 
-#define LEFT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF) + ((PWM_RESOULTION_32_BIT * MOTOR_HALF) * 0.08))
+#define LEFT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF) + ((PWM_RESOULTION_32_BIT * MOTOR_HALF) * 0.06))
 #define RIGHT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF))
 
 #define BACK_RIGHT_AIN2_PIN (33)
@@ -54,18 +54,17 @@ public:
 private:
     void ZigZag();
     void aquireSensorData();
-    void computeSensorData();
     void updateMotorQueues();
     void disableMotors();
-    void setDrivingState(DRIVING_STATE state);
     void turnLeft();
     void turnRight();
     void useGyro();
+    void reverse();
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];
     float m_gyro_data;
-    float m_initial = 0;
+    float m_initial = 0.00;
     float m_r_adjust_factor = 0.00;
     float m_l_adjust_factor = 0.00;
     float m_bearing = 0.00;
