@@ -138,7 +138,7 @@ void MotorController::turnLeft()
         m_motor_data[BACK_LEFT] = MOTOR_OFF;
 
         m_driving_state = TURNLEFT;
-    }else if (m_gyro_data >= m_initial + 82 && m_driving_state == TURNLEFT)
+    }else if (m_gyro_data >= m_initial + 80 && m_driving_state == TURNLEFT)
     {
         m_driving_state = DRIVING;
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
@@ -156,7 +156,7 @@ void MotorController::turnRight()
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
 
         m_driving_state = TURNRIGHT;
-    }else if (m_gyro_data <= m_initial - 82 && m_driving_state == TURNRIGHT)
+    }else if (m_gyro_data <= m_initial - 80 && m_driving_state == TURNRIGHT)
     {
         m_driving_state = DRIVING;
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
