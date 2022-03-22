@@ -9,17 +9,7 @@ MotorController::MotorController()
 void MotorController::Init()
 {
     // nicks code for driver controlls
-    pinMode(STANDBY_PIN, OUTPUT);
-    pinMode(BACK_RIGHT_AIN1_PIN, OUTPUT); //
-    pinMode(BACK_RIGHT_AIN2_PIN, OUTPUT);
-    pinMode(BACK_LEFT_BIN1_PIN, OUTPUT);
-    pinMode(BACK_LEFT_BIN2_PIN, OUTPUT);
-
-    digitalWrite(STANDBY_PIN, HIGH);
-    digitalWrite(BACK_RIGHT_AIN1_PIN, LOW);
-    digitalWrite(BACK_RIGHT_AIN2_PIN, HIGH);
-    digitalWrite(BACK_LEFT_BIN1_PIN, HIGH);
-    digitalWrite(BACK_LEFT_BIN2_PIN, LOW);
+    m_motor_driver = MotorDriver();
 
     m_driving_state = STOP;
 }
@@ -63,22 +53,30 @@ void MotorController::ZigZag()
 
         m_driving_state = DRIVING;
         m_bearing = m_gyro_data;
+        m_motor_driver.SetMotorDirection(FORWARD);
         
 
         return;
     }
     if (m_driving_state == TURNLEFT) {turnLeft(); return;}
     if (m_driving_state == TURNRIGHT) {turnRight(); return;}
-    if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT)
+    if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT && m_driving_state != BACKWARDS)
     {
         disableMotors();
-        //m_driving_state = STOP;
-        turnLeft();
-        turnRight();
 
-        if (m_driving_state == DRIVING)
+        if (m_sensor_data[LEFT].average < 5.00 && m_sensor_data[RIGHT].average < 5.00)
         {
             reverse();
+            return;
+        }
+
+        if (m_sensor_data[LEFT].average >= 5.00 && m_driving_state != TURNRIGHT)
+        {
+            turnLeft();
+        }
+        
+        if (m_sensor_data[RIGHT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT){
+            turnRight();
         }
         return;
     }
@@ -126,7 +124,8 @@ void MotorController::useGyro()
 }
 
 void MotorController::reverse(){
-    
+    m_motor_driver.SetMotorDirection(REVERSE);
+    m_driving_state = BACKWARDS;
 }
 
 void MotorController::turnLeft()

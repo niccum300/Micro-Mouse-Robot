@@ -23,13 +23,14 @@
 
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
-enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT};
+enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT, BACKWARDS};
 
 #include <global.h>
 #include <SensorQueue.h>
 #include <MotorQueue.h>
 #include <GyroQueue.h>
 #include <SENSOR_DATA.h>
+#include <MotorDirver.h>
 
 // Senosor Data Queues
 extern SensorQueue FrontSensorQ;
@@ -69,6 +70,8 @@ private:
     float m_l_adjust_factor = 0.00;
     float m_bearing = 0.00;
     DRIVING_STATE m_driving_state;
+
+    MotorDriver m_motor_driver;
 
 };
 
