@@ -21,7 +21,7 @@ void MotorController::Init()
     digitalWrite(BACK_LEFT_BIN1_PIN, HIGH);
     digitalWrite(BACK_LEFT_BIN2_PIN, LOW);
 
-    m_driving_state = STOP;
+    m_driving_state = START;
 }
 
 void MotorController::Update()
@@ -39,8 +39,8 @@ void MotorController::aquireSensorData()
     m_sensor_data[RIGHT] = RightSensorQ.Pop();
     m_gyro_data = GyroQ.Pop();
 
-
-    Serial.printf("Front: %f | Left: %f | Right: %f \n", m_sensor_data[FRONT].average, m_sensor_data[LEFT].average, m_sensor_data[RIGHT].average);
+    //Serial.printf("\nLEFT: %d || RIGHT: %d\n", LeftEncoderCount, RightEncoderCount);
+    //Serial.printf("Front: %f | Left: %f | Right: %f \n", m_sensor_data[FRONT].average, m_sensor_data[LEFT].average, m_sensor_data[RIGHT].average);
     Serial.printf("Gyro: %f \n", m_gyro_data);
 }
 
@@ -60,42 +60,92 @@ void MotorController::ZigZag()
 {
     if (m_driving_state == STOP)
     {
-
-        m_driving_state = DRIVING;
-        m_bearing = m_gyro_data;
-        
-
         return;
     }
-    if (m_driving_state == TURNLEFT) {turnLeft(); return;}
-    if (m_driving_state == TURNRIGHT) {turnRight(); return;}
-    if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT)
-    {
-        disableMotors();
-        //m_driving_state = STOP;
-        turnLeft();
-        turnRight();
 
-        if (m_driving_state == DRIVING)
+    if (m_driving_state == STRAIGHT)
+    {
+        if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT)
         {
-            reverse();
+
+            if(m_sensor_data[RIGHT].average >= 5.00)
+            {
+                m_driving_state = TURNRIGHT;
+                m_initial = m_gyro_data;
+                m_motor_data[BACK_RIGHT] = MOTOR_OFF;
+                m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
+
+            }else if(m_sensor_data[LEFT].average >= 5.00)
+            {
+                m_driving_state = TURNLEFT;
+                m_initial = m_gyro_data;
+                m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST *.75;
+                m_motor_data[BACK_LEFT] = MOTOR_OFF;
+            }else{
+                m_driving_state = STOP;
+            }  
         }
-        return;
+        else if(m_sensor_data[RIGHT].average >= 5.00)
+        {
+            m_driving_state = TURNRIGHT;
+            m_initial = m_gyro_data;
+            m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+            m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
+
+        }else if(m_sensor_data[LEFT].average >= 5.00)
+        {
+            m_driving_state = TURNLEFT;
+            m_initial = m_gyro_data;
+            m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST *.75;
+            m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+        }
     }
 
-    if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
+    switch (m_driving_state)
     {
-        m_l_adjust_factor += 1.0;
-    }else{
-        m_l_adjust_factor = 0.0;
-    }
-    if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
-        m_r_adjust_factor += 1.0;
-    }else{
-        m_r_adjust_factor = 0.0;
-    }
+    case START:
+        m_driving_state = STRAIGHT;
+        break;
+
+    case STRAIGHT:
+        if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
+        {
+            m_l_adjust_factor += 1.0;
+        }else{
+            m_l_adjust_factor = 0.0;
+        }
+        if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
+            m_r_adjust_factor += 1.0;
+        }else{
+            m_r_adjust_factor = 0.0;
+        }
 
     useGyro();
+        break;
+    
+    case STOP:
+        disableMotors();
+        break;
+
+    case TURNLEFT:
+        turnLeft();
+        break;
+    
+    case TURNRIGHT:
+        turnRight();
+        break;
+    }
+
+    // if (m_driving_state == TURNLEFT) {turnLeft(); return;}
+    // if (m_driving_state == TURNRIGHT) {turnRight(); return;}
+    // if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT)
+    // {
+    //     disableMotors();
+    //     //m_driving_state = STOP;
+    //     turnLeft();
+    //     turnRight();
+    //     return;
+    // }
 
 }
 
@@ -125,22 +175,12 @@ void MotorController::useGyro()
     m_motor_data[BACK_RIGHT] = right_factor + m_r_adjust_factor;
 }
 
-void MotorController::reverse(){
-    
-}
 
 void MotorController::turnLeft()
 {
-    if (m_sensor_data[LEFT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
+    if (m_gyro_data >= m_initial + 84)
     {
-        m_initial = m_gyro_data;
-        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST *.75;
-        m_motor_data[BACK_LEFT] = MOTOR_OFF;
-
-        m_driving_state = TURNLEFT;
-    }else if (m_gyro_data >= m_initial + 80 && m_driving_state == TURNLEFT)
-    {
-        m_driving_state = DRIVING;
+        m_driving_state = STRAIGHT;
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
         m_bearing = m_gyro_data;
@@ -149,16 +189,10 @@ void MotorController::turnLeft()
 
 void MotorController::turnRight()
 {
-    if (m_sensor_data[RIGHT].average >= 5.00 && m_driving_state != TURNRIGHT && m_driving_state != TURNLEFT)
+    if (m_gyro_data <= m_initial - 84)
     {
-        m_initial = m_gyro_data;
-        m_motor_data[BACK_RIGHT] = MOTOR_OFF;
-        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
-
-        m_driving_state = TURNRIGHT;
-    }else if (m_gyro_data <= m_initial - 80 && m_driving_state == TURNRIGHT)
-    {
-        m_driving_state = DRIVING;
+        Serial.print("here");
+        m_driving_state = STRAIGHT;
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
         
