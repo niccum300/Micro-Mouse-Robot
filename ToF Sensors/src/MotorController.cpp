@@ -81,17 +81,34 @@ void MotorController::ZigZag()
         return;
     }
 
-    if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
+    if (m_driving_state == BACKWARDS)
     {
-        m_l_adjust_factor += 1.0;
+        if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
+        {
+            m_r_adjust_factor += 0.2;
+        }else{
+            m_r_adjust_factor = 0.0;
+        }
+        if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
+            m_l_adjust_factor += 0.2;
+        }else{
+            m_l_adjust_factor = 0.0;
+        }
     }else{
-        m_l_adjust_factor = 0.0;
+        if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
+        {
+            m_l_adjust_factor += 1.0;
+        }else{
+            m_l_adjust_factor = 0.0;
+        }
+        if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
+            m_r_adjust_factor += 1.0;
+        }else{
+            m_r_adjust_factor = 0.0;
+        }
     }
-    if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
-        m_r_adjust_factor += 1.0;
-    }else{
-        m_r_adjust_factor = 0.0;
-    }
+
+
 
     useGyro();
 
@@ -99,8 +116,18 @@ void MotorController::ZigZag()
 
 void MotorController::useGyro()
 {
-    float left_factor = ((LEFT_MOTOR_ADJUST) + (m_gyro_data - m_bearing));
-    float right_factor = ((RIGHT_MOTOR_ADJUST) - (m_gyro_data - m_bearing));
+    float left_factor = 0.0;
+    float right_factor = 0.0;
+
+    if (m_driving_state == BACKWARDS)
+    {
+        left_factor = ((LEFT_MOTOR_ADJUST) - (m_gyro_data - m_bearing));
+        right_factor = ((RIGHT_MOTOR_ADJUST) + (m_gyro_data - m_bearing));
+    }else {
+        left_factor = ((LEFT_MOTOR_ADJUST) + (m_gyro_data - m_bearing));
+        right_factor = ((RIGHT_MOTOR_ADJUST) - (m_gyro_data - m_bearing));
+    }
+    
     
 
     if(left_factor > PWM_RESOULTION_32_BIT)
