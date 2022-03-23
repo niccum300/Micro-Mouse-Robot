@@ -17,7 +17,7 @@
 
 #define BACK_RIGHT_AIN2_PIN (33)
 #define BACK_RIGHT_AIN1_PIN (34)
-#define BACK_LEFT_BIN2_PIN (10)
+#define BACK_LEFT_BIN2_PIN (39)
 #define BACK_LEFT_BIN1_PIN (38)
 #define STANDBY_PIN (36)
 
