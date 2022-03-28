@@ -17,19 +17,20 @@
 
 #define BACK_RIGHT_AIN2_PIN (33)
 #define BACK_RIGHT_AIN1_PIN (34)
-#define BACK_LEFT_BIN2_PIN (10)
+#define BACK_LEFT_BIN2_PIN (39)
 #define BACK_LEFT_BIN1_PIN (38)
 #define STANDBY_PIN (36)
 
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
-enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT};
+enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT, BACKWARDS};
 
 #include <global.h>
 #include <SensorQueue.h>
 #include <MotorQueue.h>
 #include <GyroQueue.h>
 #include <SENSOR_DATA.h>
+#include <MotorDirver.h>
 
 // Senosor Data Queues
 extern SensorQueue FrontSensorQ;
@@ -58,6 +59,7 @@ private:
     void disableMotors();
     void turnLeft();
     void turnRight();
+    void turn180();
     void useGyro();
     void reverse();
 
@@ -68,7 +70,11 @@ private:
     float m_r_adjust_factor = 0.00;
     float m_l_adjust_factor = 0.00;
     float m_bearing = 0.00;
+    int m_delay_count = 0;
+    bool m_delay = false;
     DRIVING_STATE m_driving_state;
+
+    MotorDriver m_motor_driver;
 
 };
 
