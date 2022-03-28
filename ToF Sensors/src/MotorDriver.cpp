@@ -28,8 +28,15 @@ void MotorDriver::SetMotorDirection(MotorDirection p_direction)
         digitalWrite(BACK_RIGHT_AIN2_PIN, LOW);
         digitalWrite(BACK_LEFT_BIN1_PIN, LOW);
         digitalWrite(BACK_LEFT_BIN2_PIN, HIGH);
-         digitalWrite(STANDBY_PIN, HIGH);
+        digitalWrite(STANDBY_PIN, HIGH);
         break;
+    case ZERO_POINT:
+        digitalWrite(STANDBY_PIN, LOW);
+        digitalWrite(BACK_RIGHT_AIN1_PIN, LOW);
+        digitalWrite(BACK_RIGHT_AIN2_PIN, HIGH);
+        digitalWrite(BACK_LEFT_BIN1_PIN, LOW);
+        digitalWrite(BACK_LEFT_BIN2_PIN, HIGH);
+        digitalWrite(STANDBY_PIN, HIGH);
     }
 
 }
