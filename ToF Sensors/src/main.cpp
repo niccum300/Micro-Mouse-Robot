@@ -49,6 +49,10 @@ Gyro GyroMpu(Wire, &GyroQ);
 MotorController motorController;
 
 IntervalTimer sensorTimer;
+
+int LeftEncoderCount = 0;
+int RightEncoderCount = 0;
+
 bool SensorStatus = false;
 bool Driving = false;
 
@@ -68,12 +72,26 @@ void SetFlag()
   }
 }
 
+void LeftEncoder()
+{
+  LeftEncoderCount++;
+  //Serial.printf("\nLeft ENCODER: %d\n", LeftEncoderCount);
+}
+
+void RightEncoder()
+{
+  RightEncoderCount++;
+}
+
 void setup() {
   PORTC_PCR5 = PORT_PCR_MUX(0x1);
 
   // configure portc pin 5 to be an output
   GPIOC_PDDR |= MASK(5);
-    
+
+  attachInterrupt(digitalPinToInterrupt(31), LeftEncoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(32), RightEncoder, RISING);
+
 
   Serial.begin(9600);
   configure_tof_xshut_pins();

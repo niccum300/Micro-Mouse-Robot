@@ -12,7 +12,7 @@
 #define BACK_LEFT_BIN1_PIN (38)
 #define STANDBY_PIN (36)
 
-enum MotorDirection {FORWARD, REVERSE, ZERO_POINT};
+enum MotorDirection {FORWARDS, REVERSE, ZERO_POINT, RIGHT_ZERO_POINT, LEFT_ZERO_POINT};
 
 class MotorDriver 
 {

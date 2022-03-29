@@ -7,10 +7,10 @@
 #define SENSOR_COUNT (3)
 #define MOTOR_COUNT (2)
 
-#define MIN_DISTANCE_FRONT (7.00)
+#define MIN_DISTANCE_FRONT (5.00)
 #define MIN_DISTANCE (1.50)
 #define MOTOR_OFF (0.00)
-#define MOTOR_HALF (0.45)
+#define MOTOR_HALF (0.35)
 
 #define LEFT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF) + ((PWM_RESOULTION_32_BIT * MOTOR_HALF) * 0.06))
 #define RIGHT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF))
@@ -21,9 +21,13 @@
 #define BACK_LEFT_BIN1_PIN (38)
 #define STANDBY_PIN (36)
 
+#define ECONDER_COUNT_TO_MM (0.25)
+
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
-enum DRIVING_STATE {DRIVING, START, STOP, SLOWRIGHT, SLOWLEFT, TURNLEFT, TURNRIGHT, BACKWARDS};
+enum DRIVING_STATE {STRAIGHT, START, STOP, TURNLEFT, TURNRIGHT, BACKWARDS, SLOWFORWARDS, NONE};
+
+enum EDGE_TYPE {RIGHTEDGE, LEFTEDGE, FRONTEDGE};
 
 #include <global.h>
 #include <SensorQueue.h>
@@ -44,6 +48,9 @@ extern MotorQueue BackRightMotorQ;
 //Gyro Queue
 extern GyroQueue GyroQ;
 
+extern int LeftEncoderCount;
+extern int RightEncoderCount;
+
 
 class MotorController
 {
@@ -61,7 +68,6 @@ private:
     void turnRight();
     void turn180();
     void useGyro();
-    void reverse();
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];
@@ -73,8 +79,11 @@ private:
     int m_delay_count = 0;
     bool m_delay = false;
     DRIVING_STATE m_driving_state;
+    EDGE_TYPE m_detected_edge;
+    int m_ecnoder_count = 0;
 
     MotorDriver m_motor_driver;
+    DRIVING_STATE m_turn_delay = NONE;
 
 };
 
