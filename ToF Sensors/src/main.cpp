@@ -89,8 +89,8 @@ void setup() {
   // configure portc pin 5 to be an output
   GPIOC_PDDR |= MASK(5);
 
-  //attachInterrupt(digitalPinToInterrupt(31), LeftEncoder, RISING);
-  //attachInterrupt(digitalPinToInterrupt(32), RightEncoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(31), LeftEncoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(32), RightEncoder, RISING);
 
 
   Serial.begin(9600);

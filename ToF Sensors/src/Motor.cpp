@@ -15,7 +15,7 @@ void Motor::Update()
     if (!m_motor_q->isEmpty())
     {
         SetDutyCycle(m_motor_q->Pop());
-        Serial.printf("Motor %d: %f \n", m_pin, m_duty_cycle);
+        //Serial.printf("Motor %d: %f \n", m_pin, m_duty_cycle);
         analogWrite(m_pin, m_duty_cycle);
     }
 }
