@@ -30,7 +30,7 @@ void MotorController::aquireSensorData()
     m_sensor_data[RIGHT] = RightSensorQ.Pop();
     m_gyro_data = GyroQ.Pop();
 
-    //Serial.printf("\nLEFT: %d || RIGHT: %d\n", LeftEncoderCount, RightEncoderCount);
+    Serial.printf("\nLEFT: %d || RIGHT: %d\n", LeftEncoderCount, RightEncoderCount);
     //Serial.printf("Front: %f | Left: %f | Right: %f \n", m_sensor_data[FRONT].average, m_sensor_data[LEFT].average, m_sensor_data[RIGHT].average);
     Serial.printf("Gyro: %f \n", m_gyro_data);
 }
@@ -70,7 +70,7 @@ void MotorController::ZigZag()
             m_detected_edge = RIGHTEDGE;
             m_driving_state = SLOWFORWARDS;
             disableMotors();
-            m_ecnoder_count = ((LeftEncoderCount + RightEncoderCount) / 2);
+            m_ecnoder_count = RightEncoderCount;
             m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .5;
             m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST *.5;
         
@@ -79,7 +79,7 @@ void MotorController::ZigZag()
             m_driving_state = SLOWFORWARDS;
             m_detected_edge = LEFTEDGE;
             disableMotors();
-            m_ecnoder_count = ((LeftEncoderCount + RightEncoderCount) / 2);
+            m_ecnoder_count = RightEncoderCount;
             m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .5;
             m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST *.5;
         }
@@ -128,10 +128,10 @@ void MotorController::ZigZag()
 
     case SLOWFORWARDS:
         Serial.print("Slow");
-        int ecndoerCount = ((LeftEncoderCount + RightEncoderCount) / 2) - m_ecnoder_count;
+        int ecndoerCount = RightEncoderCount  - m_ecnoder_count;
         Serial.print("Encoders");
         Serial.println(ecndoerCount);
-        if (ecndoerCount >= 80){
+        if (ecndoerCount >= 190){
             if (m_detected_edge == RIGHTEDGE)
             {
                 m_driving_state = TURNRIGHT;
@@ -184,17 +184,17 @@ void MotorController::useGyro()
 
 void MotorController::turnLeft()
 {
-    if (m_gyro_data >= m_initial + 84 && m_turn_delay != TURNLEFT)
+    if (m_gyro_data >= m_initial + 86 && m_turn_delay != TURNLEFT)
     {
         m_turn_delay = TURNLEFT;
         m_motor_driver.SetMotorDirection(FORWARDS);
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
-        m_ecnoder_count = ((LeftEncoderCount + RightEncoderCount) / 2);
+        m_ecnoder_count = RightEncoderCount;
     }else if(m_turn_delay == TURNLEFT)
     {
-        int encoder = ((LeftEncoderCount + RightEncoderCount) / 2) - m_ecnoder_count; 
-        if (encoder >= 25)
+        int encoder = RightEncoderCount - m_ecnoder_count; 
+        if (encoder >= 70)
         {
             m_driving_state = STRAIGHT;
             m_turn_delay = STRAIGHT;
@@ -206,17 +206,19 @@ void MotorController::turnLeft()
 
 void MotorController::turnRight()
 {
-    if (m_gyro_data <= m_initial - 84 && m_turn_delay != TURNRIGHT)
+    if (m_gyro_data <= m_initial - 86 && m_turn_delay != TURNRIGHT)
     {
         m_turn_delay = TURNRIGHT;
         m_motor_driver.SetMotorDirection(FORWARDS);
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
-        m_ecnoder_count = ((LeftEncoderCount + RightEncoderCount) / 2);
+        m_ecnoder_count = (RightEncoderCount);
     }else if(m_turn_delay == TURNRIGHT)
     {
-        int encoder = ((LeftEncoderCount + RightEncoderCount) / 2) - m_ecnoder_count; 
-        if (encoder >= 25)
+        int encoder = RightEncoderCount - m_ecnoder_count; 
+        Serial.println(encoder);
+        Serial.println();
+        if (encoder >= 70)
         {
             m_driving_state = STRAIGHT;
             m_turn_delay = STRAIGHT;
