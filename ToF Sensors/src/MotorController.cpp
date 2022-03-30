@@ -206,7 +206,7 @@ void MotorController::turnLeft()
 
 void MotorController::turnRight()
 {
-    if (m_gyro_data <= m_initial - 86 && m_turn_delay != TURNRIGHT)
+    if (m_gyro_data <= m_initial - 85 && m_turn_delay != TURNRIGHT)
     {
         m_turn_delay = TURNRIGHT;
         m_motor_driver.SetMotorDirection(FORWARDS);
