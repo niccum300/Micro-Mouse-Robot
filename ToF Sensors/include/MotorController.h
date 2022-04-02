@@ -25,7 +25,8 @@
 
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
-enum DRIVING_STATE {STRAIGHT, START, STOP, TURNLEFT, TURNRIGHT, BACKWARDS, SLOWFORWARDS, NONE};
+enum DRIVING_STATE {STRAIGHT, START, STOP, TURNLEFT, TURNRIGHT, TURN, BACKWARDS, SLOWFORWARDS, NONE};
+
 
 enum EDGE_TYPE {RIGHTEDGE, LEFTEDGE, FRONTEDGE};
 
@@ -68,6 +69,9 @@ private:
     void turnRight();
     void turn180();
     void useGyro();
+    void runStateMachine();
+    void checkSurroundings();
+    void generate_numbers();
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];
@@ -81,6 +85,11 @@ private:
     DRIVING_STATE m_driving_state;
     EDGE_TYPE m_detected_edge;
     int m_ecnoder_count = 0;
+
+    bool right_turns = true;
+    bool left_turns = true;
+    bool stright = true;
+    bool turn_made = true;
 
     MotorDriver m_motor_driver;
     DRIVING_STATE m_turn_delay = NONE;

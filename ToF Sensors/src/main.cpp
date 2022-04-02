@@ -54,6 +54,7 @@ int LeftEncoderCount = 0;
 int RightEncoderCount = 0;
 
 bool SensorStatus = false;
+bool decisionTimer = false;
 bool Driving = false;
 
 // configure pins to output for shutting down each ToF
@@ -71,6 +72,7 @@ void SetFlag()
       Driving = true;
   }
 }
+
 
 void LeftEncoder()
 {
