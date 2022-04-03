@@ -22,6 +22,10 @@ public:
 
     void SetMotorDirection(MotorDirection p_direction);
 
+    void ToggleZeroDirection();
+
+    MotorDirection m_current_direction = FORWARDS;
+
 };
 
 #endif

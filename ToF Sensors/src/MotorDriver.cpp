@@ -20,6 +20,7 @@ void MotorDriver::SetMotorDirection(MotorDirection p_direction)
         digitalWrite(BACK_RIGHT_AIN2_PIN, HIGH);
         digitalWrite(BACK_LEFT_BIN1_PIN, HIGH);
         digitalWrite(BACK_LEFT_BIN2_PIN, LOW);
+        m_current_direction = FORWARDS;
         break;
     
     case REVERSE:
@@ -29,6 +30,7 @@ void MotorDriver::SetMotorDirection(MotorDirection p_direction)
         digitalWrite(BACK_LEFT_BIN1_PIN, LOW);
         digitalWrite(BACK_LEFT_BIN2_PIN, HIGH);
         digitalWrite(STANDBY_PIN, HIGH);
+        m_current_direction = REVERSE;
         break;
 
     case LEFT_ZERO_POINT:
@@ -38,6 +40,7 @@ void MotorDriver::SetMotorDirection(MotorDirection p_direction)
         digitalWrite(BACK_LEFT_BIN1_PIN, LOW);
         digitalWrite(BACK_LEFT_BIN2_PIN, HIGH);
         digitalWrite(STANDBY_PIN, HIGH);
+        m_current_direction = LEFT_ZERO_POINT;
         break;
 
     case RIGHT_ZERO_POINT:
@@ -47,7 +50,20 @@ void MotorDriver::SetMotorDirection(MotorDirection p_direction)
         digitalWrite(BACK_LEFT_BIN1_PIN, HIGH);
         digitalWrite(BACK_LEFT_BIN2_PIN, LOW);
         digitalWrite(STANDBY_PIN, HIGH);
+        m_current_direction = RIGHT_ZERO_POINT;
         break;
     }
 
+}
+
+void MotorDriver::ToggleZeroDirection()
+{
+    if (m_current_direction == RIGHT_ZERO_POINT)
+    {
+        this->SetMotorDirection(LEFT_ZERO_POINT);
+    }
+    else if (m_current_direction == LEFT_ZERO_POINT)
+    {
+        this->SetMotorDirection(RIGHT_ZERO_POINT);
+    }
 }

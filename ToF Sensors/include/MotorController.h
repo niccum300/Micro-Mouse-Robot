@@ -99,6 +99,9 @@ private:
     bool straight = true;
     bool turn_made = true;
 
+    int error_count = 0;
+    int m_gyro_progress = 0.00;
+
     MotorDriver m_motor_driver;
     DRIVING_STATE m_turn_delay = NONE;
 

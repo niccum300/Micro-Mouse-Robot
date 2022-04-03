@@ -253,6 +253,17 @@ void MotorController::runStateMachine()
         turnRight();
         break;
     case BACKWARDS:
+        if (abs(m_gyro_data) - abs(m_gyro_progress) < 2 )
+        {
+            error_count++;
+        }
+
+        if (error_count >= 30)
+        {
+            m_motor_driver.ToggleZeroDirection();
+            error_count = -20;
+        }
+    
         turn180();
         break;
 
@@ -284,14 +295,18 @@ void MotorController::ZigZag()
     if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
     {
         m_l_adjust_factor += 1.0;
+        m_r_adjust_factor -= 1.0;
     }else{
         m_l_adjust_factor = 0.0;
+        m_r_adjust_factor = 1.0;
     }
 
     if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
         m_r_adjust_factor += 1.0;
+        m_l_adjust_factor -= 1.0;
     }else{
         m_r_adjust_factor = 0.0;
+        m_l_adjust_factor = 0.0;
     }
 
     useGyro();
@@ -393,13 +408,22 @@ void MotorController::turn180()
         return;
     }
     
-    if (m_gyro_data >= m_initial + 172 && m_driving_state == BACKWARDS)
+    if (m_gyro_data >= m_initial + 172 && m_driving_state == BACKWARDS && m_motor_driver.m_current_direction == LEFT_ZERO_POINT)
     {
         m_driving_state = STRAIGHT;
         m_motor_driver.SetMotorDirection(FORWARDS);
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
-        
         m_bearing = m_gyro_data;
+
+    }else if(m_gyro_data <= m_initial - 172 && m_driving_state == BACKWARDS && m_motor_driver.m_current_direction == RIGHT_ZERO_POINT)
+    {
+        m_driving_state = STRAIGHT;
+        m_motor_driver.SetMotorDirection(FORWARDS);
+        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
+        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
+        m_bearing = m_gyro_data;
+    }else {
+        m_gyro_progress = m_gyro_data;
     }
 }
