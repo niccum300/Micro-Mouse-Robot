@@ -412,16 +412,16 @@ void MotorController::turn180()
     {
         m_driving_state = STRAIGHT;
         m_motor_driver.SetMotorDirection(FORWARDS);
-        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
-        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
+        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST - 15;
+        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST + 15;
         m_bearing = m_gyro_data;
 
     }else if(m_gyro_data <= m_initial - 172 && m_driving_state == BACKWARDS && m_motor_driver.m_current_direction == RIGHT_ZERO_POINT)
     {
         m_driving_state = STRAIGHT;
         m_motor_driver.SetMotorDirection(FORWARDS);
-        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
-        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
+        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST + 15;
+        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST - 15;
         m_bearing = m_gyro_data;
     }else {
         m_gyro_progress = m_gyro_data;
