@@ -3,7 +3,7 @@
 // public
 MotorController::MotorController()
 {
-
+    Entropy.Initialize();
 }
 
 void MotorController::Init()
@@ -50,56 +50,179 @@ void MotorController::disableMotors()
 
 void MotorController::generate_numbers()
 {
-    uint8_t num = random(12);
+    int num = Entropy.random(12);
     Serial.println(num);
-    if (num % 2 == 0){
-        Serial.println("right turns");
+    if (num >= 6){
+        Serial.println("straight");
         left_turns = false;
-        right_turns = true;
-        //stright = false;
-    }else{
+        right_turns = false;
+        straight = true;
+    }else if (num % 3 == 1){
         Serial.println("left turns");
         right_turns = false;
         left_turns = true;
-        //stright = false;
+        straight = false;
+    }else{
+         right_turns = true;;
+         left_turns = false;
+         straight = false;
     }
-    // }else{
-    //     right_turns = false;
-    //     left_turns = false;
-    //     stright = true;
-    // }
 }
 
 void MotorController::checkSurroundings()
 {
-    
+    INTERSECTION intersection;
+
     if (m_sensor_data[FRONT].average <= MIN_DISTANCE_FRONT && m_sensor_data[RIGHT].average <= MIN_DISTANCE_FRONT && m_sensor_data[LEFT].average <= MIN_DISTANCE_FRONT)
     {
         disableMotors();
+        intersection.REAR = REAR_OPENING;
         m_driving_state = BACKWARDS;
         m_delay = true;
         return;
         
-    }else if (m_sensor_data[RIGHT].average >= 5.00 && right_turns)
-    {
-        m_detected_edge = RIGHTEDGE;
-        m_driving_state = SLOWFORWARDS;
-        m_ecnoder_count = RightEncoderCount;
-        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
-        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+    }else{
 
-    }else if (m_sensor_data[LEFT].average >= 5.00 && left_turns)
-    {
-        m_detected_edge = LEFTEDGE;
-        m_driving_state = SLOWFORWARDS;
-        m_ecnoder_count = RightEncoderCount;
-        m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
-        m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+        if (m_delay)
+        {
+            int ecndoerCount = RightEncoderCount  - m_ecnoder_count;
+            if (ecndoerCount >= 220){
+                m_delay = false;
+            
+            }else{
+                return;
+            }
+        }
 
-    }else if(turn_made == true){
-        generate_numbers();
-        turn_made = false;
+        if (m_sensor_data[LEFT].average >= 5.00)
+        {
+            intersection.LEFT = LEFT_OPENING;
+        }
+
+        if (m_sensor_data[RIGHT].average >= 5.00)
+        {
+            intersection.RIGHT = RIGHT_OPENING;
+        }
+
+        if (m_sensor_data[FRONT].average > 10.00)
+        {
+            intersection.FORNT = FRONT_OPENING;
+        }
+
+        if (intersection.RIGHT != NO_OPENING && intersection.LEFT != NO_OPENING && intersection.FORNT != NO_OPENING)
+        {
+            generate_numbers();
+
+            if (right_turns == true)
+            {
+                m_detected_edge = RIGHTEDGE;
+                m_driving_state = SLOWFORWARDS;
+                m_ecnoder_count = RightEncoderCount;
+                m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+                m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+
+                return;
+            }else if (left_turns == true)
+            {
+                m_detected_edge = LEFTEDGE;
+                m_driving_state = SLOWFORWARDS;
+                m_ecnoder_count = RightEncoderCount;
+                m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+                m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+
+                return;
+            }else if (straight == true)
+            {
+                m_ecnoder_count = RightEncoderCount;
+                m_delay = true;
+                return;
+            }
+
+        }else if (intersection.RIGHT != NO_OPENING && intersection.LEFT != NO_OPENING && intersection.FORNT == NO_OPENING)
+        {
+            int num = Entropy.random(12);
+
+            if (num % 2 == 0)
+            {
+                m_detected_edge = RIGHTEDGE;
+                m_driving_state = SLOWFORWARDS;
+                m_ecnoder_count = RightEncoderCount;
+                m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+                m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+                return;
+
+            }else{
+                m_detected_edge = LEFTEDGE;
+                m_driving_state = SLOWFORWARDS;
+                m_ecnoder_count = RightEncoderCount;
+                m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+                m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+                return;
+            }
+
+            
+
+        }else if (intersection.RIGHT != NO_OPENING && intersection.LEFT == NO_OPENING && intersection.FORNT == NO_OPENING)
+        {
+
+            m_detected_edge = RIGHTEDGE;
+            m_driving_state = SLOWFORWARDS;
+            m_ecnoder_count = RightEncoderCount;
+            m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+            m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+            return;
+
+
+        }else if (intersection.RIGHT == NO_OPENING && intersection.LEFT != NO_OPENING && intersection.FORNT == NO_OPENING)
+        {
+            m_detected_edge = LEFTEDGE;
+            m_driving_state = SLOWFORWARDS;
+            m_ecnoder_count = RightEncoderCount;
+            m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+            m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+            return;
+
+        }
+        else if (intersection.RIGHT != NO_OPENING && intersection.LEFT == NO_OPENING && intersection.FORNT != NO_OPENING)
+        {
+            int num = Entropy.random(12);
+
+            if (num % 2 == 0)
+            {
+                m_detected_edge = RIGHTEDGE;
+                m_driving_state = SLOWFORWARDS;
+                m_ecnoder_count = RightEncoderCount;
+                m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+                m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+                return;
+
+            }else{
+                m_ecnoder_count = RightEncoderCount;
+                m_delay = true;
+                return;
+            }
+
+        }else if (intersection.RIGHT == NO_OPENING && intersection.LEFT != NO_OPENING && intersection.FORNT != NO_OPENING)
+        {
+            int num = Entropy.random(12);
+
+            if (num % 2 == 0)
+            {
+                m_detected_edge = LEFTEDGE;
+                m_driving_state = SLOWFORWARDS;
+                m_ecnoder_count = RightEncoderCount;
+                m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
+                m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
+                return;
+
+            }else{
+                m_ecnoder_count = RightEncoderCount;
+                m_delay = true;
+                return;
+            }
+        }
     }
+
 }
 
 void MotorController::runStateMachine()

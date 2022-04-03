@@ -26,9 +26,16 @@
 enum MOTOR_ID {BACK_LEFT = 0, BACK_RIGHT = 1};
 
 enum DRIVING_STATE {STRAIGHT, START, STOP, TURNLEFT, TURNRIGHT, TURN, BACKWARDS, SLOWFORWARDS, NONE};
-
-
 enum EDGE_TYPE {RIGHTEDGE, LEFTEDGE, FRONTEDGE};
+
+enum INTERSECTION_VALUES {FRONT_OPENING, LEFT_OPENING, RIGHT_OPENING, REAR_OPENING, NO_OPENING};
+
+struct INTERSECTION {
+    INTERSECTION_VALUES FORNT = NO_OPENING;
+    INTERSECTION_VALUES LEFT = NO_OPENING;
+    INTERSECTION_VALUES RIGHT = NO_OPENING;
+    INTERSECTION_VALUES REAR = NO_OPENING;
+};
 
 #include <global.h>
 #include <SensorQueue.h>
@@ -36,6 +43,7 @@ enum EDGE_TYPE {RIGHTEDGE, LEFTEDGE, FRONTEDGE};
 #include <GyroQueue.h>
 #include <SENSOR_DATA.h>
 #include <MotorDirver.h>
+#include <Entropy.h>
 
 // Senosor Data Queues
 extern SensorQueue FrontSensorQ;
@@ -86,9 +94,9 @@ private:
     EDGE_TYPE m_detected_edge;
     int m_ecnoder_count = 0;
 
-    bool right_turns = true;
-    bool left_turns = true;
-    bool stright = true;
+    bool right_turns = false;
+    bool left_turns = false;
+    bool straight = true;
     bool turn_made = true;
 
     MotorDriver m_motor_driver;
