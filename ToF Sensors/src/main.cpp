@@ -1,6 +1,5 @@
 // Authors: Brayton Niccum
 #include <IntervalTimer.h>
-
 #include <global.h>
 #include <TOF.h>
 #include <Motor.h>

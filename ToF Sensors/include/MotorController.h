@@ -8,7 +8,7 @@
 #define MOTOR_COUNT (2)
 
 #define MIN_DISTANCE_FRONT (5.00)
-#define MIN_DISTANCE (1.50)
+#define MIN_DISTANCE (1.25)
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.35)
 

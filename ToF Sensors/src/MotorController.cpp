@@ -30,7 +30,7 @@ void MotorController::aquireSensorData()
     m_sensor_data[RIGHT] = RightSensorQ.Pop();
     m_gyro_data = GyroQ.Pop();
 
-    //Serial.printf("\nLEFT: %d || RIGHT: %d\n", LeftEncoderCount, RightEncoderCount);
+    Serial.printf("\nLEFT: %d || RIGHT: %d\n", LeftEncoderCount, RightEncoderCount);
     //Serial.printf("Front: %f | Left: %f | Right: %f \n", m_sensor_data[FRONT].average, m_sensor_data[LEFT].average, m_sensor_data[RIGHT].average);
     //Serial.printf("Gyro: %f \n", m_gyro_data);
 }
@@ -86,7 +86,7 @@ void MotorController::checkSurroundings()
         if (m_delay)
         {
             int ecndoerCount = RightEncoderCount  - m_ecnoder_count;
-            if (ecndoerCount >= 220){
+            if (ecndoerCount >= 230){
                 m_delay = false;
             
             }else{
@@ -253,7 +253,7 @@ void MotorController::runStateMachine()
         turnRight();
         break;
     case BACKWARDS:
-        if (abs(m_gyro_data) - abs(m_gyro_progress) < 2 )
+        if (abs(abs(m_gyro_data) - abs(m_gyro_progress)) <= 2 )
         {
             error_count++;
         }
@@ -295,18 +295,18 @@ void MotorController::ZigZag()
     if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
     {
         m_l_adjust_factor += 1.0;
-        m_r_adjust_factor -= 1.0;
+        //m_r_adjust_factor -= 1.0;
     }else{
         m_l_adjust_factor = 0.0;
-        m_r_adjust_factor = 1.0;
+        //m_r_adjust_factor = 1.0;
     }
 
     if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
         m_r_adjust_factor += 1.0;
-        m_l_adjust_factor -= 1.0;
+        //m_l_adjust_factor -= 1.0;
     }else{
         m_r_adjust_factor = 0.0;
-        m_l_adjust_factor = 0.0;
+        //m_l_adjust_factor = 0.0;
     }
 
     useGyro();
@@ -344,7 +344,7 @@ void MotorController::useGyro()
 
 void MotorController::turnLeft()
 {
-    if (m_gyro_data >= m_initial + 86 && m_turn_delay != TURNLEFT)
+    if (m_gyro_data >= m_initial + 88 && m_turn_delay != TURNLEFT)
     {
         m_turn_delay = TURNLEFT;
         m_motor_driver.SetMotorDirection(FORWARDS);
@@ -367,7 +367,7 @@ void MotorController::turnLeft()
 
 void MotorController::turnRight()
 {
-    if (m_gyro_data <= m_initial - 85 && m_turn_delay != TURNRIGHT)
+    if (m_gyro_data <= m_initial - 83 && m_turn_delay != TURNRIGHT)
     {
         m_turn_delay = TURNRIGHT;
         m_motor_driver.SetMotorDirection(FORWARDS);
@@ -408,7 +408,7 @@ void MotorController::turn180()
         return;
     }
     
-    if (m_gyro_data >= m_initial + 172 && m_driving_state == BACKWARDS && m_motor_driver.m_current_direction == LEFT_ZERO_POINT)
+    if (m_gyro_data >= m_initial + 174 && m_driving_state == BACKWARDS && m_motor_driver.m_current_direction == LEFT_ZERO_POINT)
     {
         m_driving_state = STRAIGHT;
         m_motor_driver.SetMotorDirection(FORWARDS);
