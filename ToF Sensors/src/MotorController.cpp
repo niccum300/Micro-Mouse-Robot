@@ -238,7 +238,18 @@ void MotorController::runStateMachine()
 
     case STRAIGHT:
         ZigZag();
-        checkSurroundings();
+
+
+        if (m_turn_delay != NONE){
+            int encoder = RightEncoderCount; 
+            if (encoder >= 50)
+            {
+                m_turn_delay = NONE;
+            }
+        }else{
+            checkSurroundings();
+        }
+
         break;
     
     case STOP:
@@ -329,49 +340,31 @@ void MotorController::useGyro()
 
 void MotorController::turnLeft()
 {
-    if (m_gyro_data >= m_initial + 85 && m_turn_delay != TURNLEFT)
+    if (m_gyro_data >= m_initial + 86 && m_turn_delay != TURNLEFT)
     {
         m_turn_delay = TURNLEFT;
+        m_driving_state = STRAIGHT;
+        m_bearing = m_gyro_data;
         m_motor_driver.SetMotorDirection(FORWARDS);
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
         RightEncoderCount = 0;
         turn_made = true;
-    }else if(m_turn_delay == TURNLEFT)
-    {
-        int encoder = RightEncoderCount; 
-        if (encoder >= 50)
-        {
-            m_driving_state = STRAIGHT;
-            m_turn_delay = STRAIGHT;
-            RightEncoderCount = 0;
-            m_bearing = m_gyro_data;
-        }
     }
 }
 
 void MotorController::turnRight()
 {
-    if (m_gyro_data <= m_initial - 84 && m_turn_delay != TURNRIGHT)
+    if (m_gyro_data <= m_initial - 85 && m_turn_delay != TURNRIGHT)
     {
         m_turn_delay = TURNRIGHT;
+        m_driving_state = STRAIGHT;
+        m_bearing = m_gyro_data;
         m_motor_driver.SetMotorDirection(FORWARDS);
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
         RightEncoderCount = 0;
         turn_made = true;
-    }else if(m_turn_delay == TURNRIGHT)
-    {
-        int encoder = RightEncoderCount; 
-        Serial.println(encoder);
-        Serial.println();
-        if (encoder >= 50)
-        {
-            m_driving_state = STRAIGHT;
-            m_turn_delay = STRAIGHT;
-            RightEncoderCount = 0;
-            m_bearing = m_gyro_data;
-        }
     }
 }
 
