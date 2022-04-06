@@ -30,7 +30,7 @@ void MotorController::aquireSensorData()
     m_sensor_data[RIGHT] = RightSensorQ.Pop();
     m_gyro_data = GyroQ.Pop();
 
-    //Serial.printf("\nLEFT: %d || RIGHT: %d\n", LeftEncoderCount, RightEncoderCount);
+    Serial.printf("\nLEFT: %d || RIGHT: %d\n", LeftEncoderCount, RightEncoderCount);
     //Serial.printf("Front: %f | Left: %f | Right: %f \n", m_sensor_data[FRONT].average, m_sensor_data[LEFT].average, m_sensor_data[RIGHT].average);
     //Serial.printf("Gyro: %f \n", m_gyro_data);
 }
@@ -52,21 +52,29 @@ void MotorController::generate_numbers()
 {
     int num = Entropy.random(12);
     Serial.println(num);
-    if (num >= 6){
+    if (num % 3 == 0){
         Serial.println("straight");
         left_turns = false;
-        right_turns = false;
-        straight = true;
+        right_turns = true;
+        straight = false;
     }else if (num % 3 == 1){
         Serial.println("left turns");
         right_turns = false;
         left_turns = true;
         straight = false;
     }else{
-         right_turns = true;;
+         right_turns = false;;
          left_turns = false;
-         straight = false;
+         straight = true;
     }
+}
+
+void MotorController::clear_encoders()
+{
+    noInterrupts();
+    RightEncoderCount = 0;
+    LeftEncoderCount = 0;
+    interrupts();
 }
 
 void MotorController::checkSurroundings()
@@ -85,10 +93,10 @@ void MotorController::checkSurroundings()
 
         if (m_delay)
         {
-            int ecndoerCount = RightEncoderCount;
-            if (ecndoerCount >= 260){
+            int ecndoerCount = (RightEncoderCount + LeftEncoderCount)/2;
+            if (ecndoerCount >= 270){
                 m_delay = false;
-            
+                return;
             }else{
                 return;
             }
@@ -104,7 +112,7 @@ void MotorController::checkSurroundings()
             intersection.RIGHT = RIGHT_OPENING;
         }
 
-        if (m_sensor_data[FRONT].average > 10.00)
+        if (m_sensor_data[FRONT].average > 10.50)
         {
             intersection.FORNT = FRONT_OPENING;
         }
@@ -117,7 +125,7 @@ void MotorController::checkSurroundings()
             {
                 m_detected_edge = RIGHTEDGE;
                 m_driving_state = SLOWFORWARDS;
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
                 m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
 
@@ -126,14 +134,14 @@ void MotorController::checkSurroundings()
             {
                 m_detected_edge = LEFTEDGE;
                 m_driving_state = SLOWFORWARDS;
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
                 m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
 
                 return;
             }else if (straight == true)
             {
-               RightEncoderCount = 0;
+                clear_encoders();
                 m_delay = true;
                 return;
             }
@@ -146,7 +154,7 @@ void MotorController::checkSurroundings()
             {
                 m_detected_edge = RIGHTEDGE;
                 m_driving_state = SLOWFORWARDS;
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
                 m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
                 return;
@@ -154,7 +162,7 @@ void MotorController::checkSurroundings()
             }else{
                 m_detected_edge = LEFTEDGE;
                 m_driving_state = SLOWFORWARDS;
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
                 m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
                 return;
@@ -167,7 +175,7 @@ void MotorController::checkSurroundings()
 
             m_detected_edge = RIGHTEDGE;
             m_driving_state = SLOWFORWARDS;
-            RightEncoderCount = 0;
+            clear_encoders();
             m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
             m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
             return;
@@ -177,7 +185,7 @@ void MotorController::checkSurroundings()
         {
             m_detected_edge = LEFTEDGE;
             m_driving_state = SLOWFORWARDS;
-            RightEncoderCount = 0;
+            clear_encoders();
             m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
             m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
             return;
@@ -191,13 +199,13 @@ void MotorController::checkSurroundings()
             {
                 m_detected_edge = RIGHTEDGE;
                 m_driving_state = SLOWFORWARDS;
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
                 m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
                 return;
 
             }else{
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_delay = true;
                 return;
             }
@@ -210,13 +218,13 @@ void MotorController::checkSurroundings()
             {
                 m_detected_edge = LEFTEDGE;
                 m_driving_state = SLOWFORWARDS;
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST * .3;
                 m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST * .3;
                 return;
 
             }else{
-                RightEncoderCount = 0;
+                clear_encoders();
                 m_delay = true;
                 return;
             }
@@ -241,10 +249,11 @@ void MotorController::runStateMachine()
 
 
         if (m_turn_delay != NONE){
-            int encoder = RightEncoderCount; 
+            int encoder = (RightEncoderCount + LeftEncoderCount)/2; 
             if (encoder >= 50)
             {
                 m_turn_delay = NONE;
+                clear_encoders();
             }
         }else{
             checkSurroundings();
@@ -268,8 +277,9 @@ void MotorController::runStateMachine()
         break;
 
     case SLOWFORWARDS:
-        int ecndoerCount = RightEncoderCount;
+        int ecndoerCount = (RightEncoderCount + LeftEncoderCount)/2;
         if (ecndoerCount >= 190){
+            clear_encoders();
             if (m_detected_edge == RIGHTEDGE)
             {
                 m_driving_state = TURNRIGHT;
@@ -294,13 +304,13 @@ void MotorController::ZigZag()
 
     if (m_sensor_data[LEFT].average < MIN_DISTANCE) 
     {
-        m_l_adjust_factor += 1.0;
+        m_l_adjust_factor += 2.0;
     }else{
         m_l_adjust_factor = 0.0;
     }
 
-    if(m_sensor_data[RIGHT].average <  MIN_DISTANCE){
-        m_r_adjust_factor += 1.0;
+    if(m_sensor_data[RIGHT].average < MIN_DISTANCE){
+        m_r_adjust_factor += 2.0;
     }else{
         m_r_adjust_factor = 0.0;
     }
@@ -340,7 +350,19 @@ void MotorController::useGyro()
 
 void MotorController::turnLeft()
 {
-    if (m_gyro_data >= m_initial + 86 && m_turn_delay != TURNLEFT)
+    // if (m_gyro_data >= m_initial + 86 && m_turn_delay != TURNLEFT)
+    // {
+    //     m_turn_delay = TURNLEFT;
+    //     m_driving_state = STRAIGHT;
+    //     m_bearing = m_gyro_data;
+    //     m_motor_driver.SetMotorDirection(FORWARDS);
+    //     m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
+    //     m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
+    //     RightEncoderCount = 0;
+    //     turn_made = true;
+    // }
+
+    if ((RightEncoderCount + LeftEncoderCount)/2 >= 163 && m_turn_delay != TURNLEFT)
     {
         m_turn_delay = TURNLEFT;
         m_driving_state = STRAIGHT;
@@ -348,14 +370,13 @@ void MotorController::turnLeft()
         m_motor_driver.SetMotorDirection(FORWARDS);
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
-        RightEncoderCount = 0;
-        turn_made = true;
+        clear_encoders();
     }
 }
 
 void MotorController::turnRight()
 {
-    if (m_gyro_data <= m_initial - 85 && m_turn_delay != TURNRIGHT)
+    if ((RightEncoderCount + LeftEncoderCount)/2 >= 160 && m_turn_delay != TURNRIGHT)
     {
         m_turn_delay = TURNRIGHT;
         m_driving_state = STRAIGHT;
@@ -363,8 +384,7 @@ void MotorController::turnRight()
         m_motor_driver.SetMotorDirection(FORWARDS);
         m_motor_data[BACK_LEFT] = LEFT_MOTOR_ADJUST;
         m_motor_data[BACK_RIGHT] = RIGHT_MOTOR_ADJUST;
-        RightEncoderCount = 0;
-        turn_made = true;
+        clear_encoders();
     }
 }
 

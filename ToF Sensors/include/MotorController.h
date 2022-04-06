@@ -12,7 +12,7 @@
 #define MOTOR_OFF (0.00)
 #define MOTOR_HALF (0.35)
 
-#define LEFT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF) + ((PWM_RESOULTION_32_BIT * MOTOR_HALF) * 0.06))
+#define LEFT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF) + ((PWM_RESOULTION_32_BIT * MOTOR_HALF) * 0.08))
 #define RIGHT_MOTOR_ADJUST ((PWM_RESOULTION_32_BIT * MOTOR_HALF))
 
 #define BACK_RIGHT_AIN2_PIN (33)
@@ -80,6 +80,7 @@ private:
     void runStateMachine();
     void checkSurroundings();
     void generate_numbers();
+    void clear_encoders();
 
     SENSOR_DATA m_sensor_data[SENSOR_COUNT];
     float m_motor_data[MOTOR_COUNT];
@@ -96,7 +97,7 @@ private:
 
     bool right_turns = false;
     bool left_turns = false;
-    bool straight = true;
+    bool straight = false;
     bool turn_made = true;
 
     MotorDriver m_motor_driver;
